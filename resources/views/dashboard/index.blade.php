@@ -68,37 +68,41 @@
         <div style="position:absolute;bottom:-30px;left:60px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.06);"></div>
         <div style="position:absolute;top:50%;right:30px;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.05);"></div>
 
-        <div class="relative flex items-center gap-4">
-            {{-- Avatar --}}
-            <div class="flex-shrink-0">
-                @if ($user->foto)
-                    <img src="{{ asset('storage/unggah/karyawan/' . $user->foto) }}"
-                         alt="{{ $user->nama_lengkap }}"
-                         class="h-16 w-16 rounded-2xl object-cover ring-2 ring-white/30 shadow-lg">
-                @else
-                    <div class="h-16 w-16 rounded-2xl flex items-center justify-center text-2xl font-bold text-indigo-700 shadow-lg"
-                         style="background:rgba(255,255,255,0.9);">
-                        {{ mb_strtoupper(mb_substr($user->nama_lengkap, 0, 1)) }}
-                    </div>
-                @endif
-            </div>
+        <div class="relative">
+            {{-- Baris atas: avatar + nama --}}
+            <div class="flex items-center gap-3 mb-3">
+                {{-- Avatar --}}
+                <div class="flex-shrink-0">
+                    @if ($user->foto)
+                        <img src="{{ asset('storage/unggah/karyawan/' . $user->foto) }}"
+                             alt="{{ $user->nama_lengkap }}"
+                             class="h-14 w-14 rounded-2xl object-cover ring-2 ring-white/30 shadow-lg">
+                    @else
+                        <div class="h-14 w-14 rounded-2xl flex items-center justify-center text-xl font-bold text-indigo-700 shadow-lg"
+                             style="background:rgba(255,255,255,0.9);">
+                            {{ mb_strtoupper(mb_substr($user->nama_lengkap, 0, 1)) }}
+                        </div>
+                    @endif
+                </div>
 
-            {{-- Name + Greeting --}}
-            <div class="flex-1 min-w-0">
-                <p class="text-xs font-medium text-indigo-200">Selamat {{ $greeting }} 👋</p>
-                <h2 class="mt-0.5 text-lg font-bold text-white leading-tight truncate">{{ $user->nama_lengkap }}</h2>
-                <p class="text-xs text-indigo-200 truncate">{{ $user->jabatan ?: 'Karyawan' }}</p>
-                <div class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 backdrop-blur-sm">
-                    <i class="ri-calendar-line text-white text-xs"></i>
-                    <span class="text-xs font-medium text-white">{{ \Carbon\Carbon::now('Asia/Jakarta')->isoFormat('D MMM Y') }}</span>
+                {{-- Name + Greeting --}}
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-medium text-indigo-200 leading-none mb-1">Selamat {{ $greeting }} 👋</p>
+                    <h2 class="text-base font-bold text-white leading-snug" style="word-break:break-word;">{{ $user->nama_lengkap }}</h2>
+                    <p class="text-xs text-indigo-300 mt-0.5">{{ $user->jabatan ?: 'Karyawan' }}</p>
                 </div>
             </div>
 
-            {{-- Live Clock --}}
-            <div class="flex-shrink-0 text-right">
-                <div class="rounded-2xl px-3 py-2.5" style="background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);">
-                    <p class="text-[10px] font-semibold text-indigo-200 uppercase tracking-widest mb-0.5">WIB</p>
-                    <p id="live-clock" class="text-2xl font-bold text-white font-mono tracking-wider leading-none"></p>
+            {{-- Baris bawah: tanggal kiri + jam kanan --}}
+            <div class="flex items-center justify-between gap-2">
+                <div class="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 backdrop-blur-sm">
+                    <i class="ri-calendar-line text-white text-xs"></i>
+                    <span class="text-xs font-medium text-white whitespace-nowrap">{{ \Carbon\Carbon::now('Asia/Jakarta')->isoFormat('D MMM Y') }}</span>
+                </div>
+
+                <div class="rounded-2xl px-3 py-2" style="background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);">
+                    <p class="text-[10px] font-semibold text-indigo-200 uppercase tracking-widest text-center mb-0.5">WIB</p>
+                    <p id="live-clock" class="text-xl font-bold text-white font-mono tracking-wider leading-none"></p>
                 </div>
             </div>
         </div>
