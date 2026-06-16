@@ -48,11 +48,11 @@ class DashboardController extends Controller
             ->whereRaw("YEAR(tanggal_pengajuan)='"  . date('Y') . "'")
             ->first();
 
-        $leaderboard = DB::table("presensi as p")
-            ->join('karyawan as k', 'k.id', '=', 'p.karyawan_id')
-            ->where('tanggal_presensi', $hariIni)
-            ->orderBy('jam_masuk', 'asc')
-            ->select('k.nama_lengkap', 'k.jabatan', 'k.foto', 'p.jam_masuk', 'p.jam_keluar')
+        $leaderboard = DB::table("presensi")
+            ->join('karyawan', 'karyawan.id', '=', 'presensi.karyawan_id')
+            ->where('presensi.tanggal_presensi', $hariIni)
+            ->orderBy('presensi.jam_masuk', 'asc')
+            ->select('karyawan.nama_lengkap', 'karyawan.jabatan', 'karyawan.foto', 'presensi.jam_masuk', 'presensi.jam_keluar')
             ->paginate(10);
 
         $pengaturan  = Pengaturan::first();
@@ -101,11 +101,11 @@ class DashboardController extends Controller
             $data7Hari[]   = $raw7Hari[$tgl] ?? 0;
         }
 
-        $karyawanHadir = DB::table("presensi as p")
-            ->join('karyawan as k', 'k.id', '=', 'p.karyawan_id')
-            ->where('p.tanggal_presensi', $hariIni)
-            ->select('k.nama_lengkap', 'k.jabatan', 'k.foto', 'p.jam_masuk', 'p.jam_keluar')
-            ->orderBy('p.jam_masuk')
+        $karyawanHadir = DB::table("presensi")
+            ->join('karyawan', 'karyawan.id', '=', 'presensi.karyawan_id')
+            ->where('presensi.tanggal_presensi', $hariIni)
+            ->select('karyawan.nama_lengkap', 'karyawan.jabatan', 'karyawan.foto', 'presensi.jam_masuk', 'presensi.jam_keluar')
+            ->orderBy('presensi.jam_masuk')
             ->get();
 
         $rekapBulanIni = DB::table("presensi")

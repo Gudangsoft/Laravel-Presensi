@@ -301,12 +301,12 @@ class PresensiController extends Controller
 
     public function monitoringPresensi(Request $request)
     {
-        $query = DB::table('presensi as p')
-            ->join('karyawan as k', 'p.karyawan_id', '=', 'k.id')
-            ->join('departemen as d', 'k.departemen_id', '=', 'd.id')
-            ->orderBy('k.nama_lengkap', 'asc')
+        $query = DB::table('presensi')
+            ->join('karyawan', 'presensi.karyawan_id', '=', 'karyawan.id')
+            ->join('departemen as d', 'karyawan.departemen_id', '=', 'd.id')
+            ->orderBy('karyawan.nama_lengkap', 'asc')
             ->orderBy('d.kode', 'asc')
-            ->select('p.*', 'k.nama_lengkap as nama_karyawan', 'd.nama as nama_departemen');
+            ->select('presensi.*', 'karyawan.nama_lengkap as nama_karyawan', 'd.nama as nama_departemen');
 
         if ($request->tanggal_presensi) {
             $query->whereDate('p.tanggal_presensi', $request->tanggal_presensi);
@@ -363,22 +363,22 @@ class PresensiController extends Controller
         $title           = 'Laporan Presensi Semua Karyawan';
         $bulan           = $request->bulan;
         $pengaturan      = Pengaturan::first();
-        $riwayatPresensi = DB::table("presensi as p")
-            ->join('karyawan as k', 'p.karyawan_id', '=', 'k.id')
-            ->join('departemen as d', 'k.departemen_id', '=', 'd.id')
+        $riwayatPresensi = DB::table("presensi")
+            ->join('karyawan', 'presensi.karyawan_id', '=', 'karyawan.id')
+            ->join('departemen as d', 'karyawan.departemen_id', '=', 'd.id')
             ->whereMonth('tanggal_presensi', Carbon::make($bulan)->format('m'))
             ->whereYear('tanggal_presensi', Carbon::make($bulan)->format('Y'))
             ->select(
-                'p.karyawan_id',
-                'k.nama_lengkap as nama_karyawan',
-                'k.jabatan as jabatan_karyawan',
+                'presensi.karyawan_id',
+                'karyawan.nama_lengkap as nama_karyawan',
+                'karyawan.jabatan as jabatan_karyawan',
                 'd.nama as nama_departemen'
             )
-            ->selectRaw("COUNT(p.karyawan_id) as total_kehadiran, SUM(IF (jam_masuk > ?,1,0)) as total_terlambat", [$pengaturan->jam_masuk])
+            ->selectRaw("COUNT(presensi.karyawan_id) as total_kehadiran, SUM(IF (jam_masuk > ?,1,0)) as total_terlambat", [$pengaturan->jam_masuk])
             ->groupBy(
-                'p.karyawan_id',
-                'k.nama_lengkap',
-                'k.jabatan',
+                'presensi.karyawan_id',
+                'karyawan.nama_lengkap',
+                'karyawan.jabatan',
                 'd.nama'
             )
             ->orderBy("tanggal_presensi", "asc")
@@ -394,15 +394,15 @@ class PresensiController extends Controller
         $departemen = Departemen::get();
 
         $query = DB::table('pengajuan_presensi as p')
-            ->join('karyawan as k', 'k.id', '=', 'p.karyawan_id')
-            ->join('departemen as d', 'k.departemen_id', '=', 'd.id')
+            ->join('karyawan', 'karyawan.id', '=', 'p.karyawan_id')
+            ->join('departemen as d', 'karyawan.departemen_id', '=', 'd.id')
             ->where('p.tanggal_pengajuan', '>=', Carbon::now()->startOfMonth()->format("Y-m-d"))
             ->where('p.tanggal_pengajuan', '<=', Carbon::now()->endOfMonth()->format("Y-m-d"))
-            ->select('p.*', 'k.nama_lengkap as nama_karyawan', 'd.nama as nama_departemen', 'd.id as id_departemen')
+            ->select('p.*', 'karyawan.nama_lengkap as nama_karyawan', 'd.nama as nama_departemen', 'd.id as id_departemen')
             ->orderBy('p.tanggal_pengajuan', 'asc');
 
         if ($request->karyawan) {
-            $query->where('k.nama_lengkap', 'LIKE', '%' . $request->karyawan . '%');
+            $query->where('karyawan.nama_lengkap', 'LIKE', '%' . $request->karyawan . '%');
         }
         if ($request->departemen) {
             $query->where('d.id', $request->departemen);
