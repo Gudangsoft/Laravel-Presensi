@@ -309,9 +309,9 @@ class PresensiController extends Controller
             ->select('presensi.*', 'karyawan.nama_lengkap as nama_karyawan', 'd.nama as nama_departemen');
 
         if ($request->tanggal_presensi) {
-            $query->whereDate('p.tanggal_presensi', $request->tanggal_presensi);
+            $query->whereDate('presensi.tanggal_presensi', $request->tanggal_presensi);
         } else {
-            $query->whereDate('p.tanggal_presensi', Carbon::now());
+            $query->whereDate('presensi.tanggal_presensi', Carbon::now());
         }
 
         $monitoring   = $query->paginate(10);

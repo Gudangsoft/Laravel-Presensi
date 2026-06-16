@@ -26,11 +26,18 @@ class HariLibur extends Model
 
     public static function holidayDatesInMonth(int $month, int $year): array
     {
-        return static::get()->filter(function ($h) use ($month, $year) {
-            if ($h->is_recurring) {
-                return $h->tanggal->month === $month;
-            }
-            return $h->tanggal->month === $month && $h->tanggal->year === $year;
-        })->map(fn($h) => $h->tanggal->format('Y-m-d'))->values()->toArray();
+        return static::where(function ($q) use ($month, $year) {
+            $q->where(function ($q1) use ($month) {
+                $q1->where('is_recurring', true)
+                   ->whereMonth('tanggal', $month);
+            })->orWhere(function ($q2) use ($month, $year) {
+                $q2->where('is_recurring', false)
+                   ->whereMonth('tanggal', $month)
+                   ->whereYear('tanggal', $year);
+            });
+        })->get()
+          ->map(fn($h) => $h->tanggal->format('Y-m-d'))
+          ->values()
+          ->toArray();
     }
 }

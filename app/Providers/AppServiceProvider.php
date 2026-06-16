@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\BrandSetting;
 use App\Models\Notifikasi;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -18,12 +19,14 @@ class AppServiceProvider extends ServiceProvider
     {
         View::composer('*', function ($view) {
             try {
-                $view->with('brand', BrandSetting::first());
+                $brand = Cache::remember('brand_setting', 3600, fn() => BrandSetting::first());
+                $view->with('brand', $brand);
             } catch (\Throwable $e) {
                 $view->with('brand', null);
             }
             try {
-                $view->with('unreadNotifikasi', Notifikasi::unreadCount());
+                $count = Cache::remember('unread_notifikasi', 60, fn() => Notifikasi::unreadCount());
+                $view->with('unreadNotifikasi', $count);
             } catch (\Throwable $e) {
                 $view->with('unreadNotifikasi', 0);
             }

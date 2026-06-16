@@ -34,13 +34,15 @@ class NotifikasiController extends Controller
             ]);
 
         Notifikasi::whereNull('read_at')->update(['read_at' => Carbon::now()]);
+        Notifikasi::clearCache();
 
-        return response()->json(['items' => $items, 'unread' => Notifikasi::unreadCount()]);
+        return response()->json(['items' => $items, 'unread' => 0]);
     }
 
     public function markAllRead()
     {
         Notifikasi::whereNull('read_at')->update(['read_at' => Carbon::now()]);
+        Notifikasi::clearCache();
         return response()->json(['success' => true]);
     }
 }

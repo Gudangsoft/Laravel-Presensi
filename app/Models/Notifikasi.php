@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Notifikasi extends Model
 {
@@ -18,10 +19,16 @@ class Notifikasi extends Model
     public static function send(string $title, string $message, string $type = 'info', ?string $url = null): void
     {
         static::create(compact('title', 'message', 'type', 'url'));
+        Cache::forget('unread_notifikasi');
     }
 
     public static function unreadCount(): int
     {
         return static::whereNull('read_at')->count();
+    }
+
+    public static function clearCache(): void
+    {
+        Cache::forget('unread_notifikasi');
     }
 }

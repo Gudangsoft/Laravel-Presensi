@@ -33,19 +33,20 @@ class DashboardController extends Controller
             ->orderBy("tanggal_presensi", "desc")
             ->paginate(10);
 
+        $awalBulan = Carbon::now()->startOfMonth()->format('Y-m-d');
+        $akhirBulan = Carbon::now()->endOfMonth()->format('Y-m-d');
+
         $rekapPresensi = DB::table("presensi")
             ->selectRaw("COUNT(karyawan_id) as jml_kehadiran, SUM(IF (jam_masuk > '08:00',1,0)) as jml_terlambat")
             ->where('karyawan_id', $user->id)
-            ->whereRaw("MONTH(tanggal_presensi)='" . date('m') . "'")
-            ->whereRaw("YEAR(tanggal_presensi)='"  . date('Y') . "'")
+            ->whereBetween('tanggal_presensi', [$awalBulan, $akhirBulan])
             ->first();
 
         $rekapPengajuanPresensi = DB::table("pengajuan_presensi")
             ->selectRaw("SUM(IF (status = 'I',1,0)) as jml_izin, SUM(IF (status = 'S',1,0)) as jml_sakit")
             ->where('karyawan_id', $user->id)
             ->where('status_approved', 1)
-            ->whereRaw("MONTH(tanggal_pengajuan)='" . date('m') . "'")
-            ->whereRaw("YEAR(tanggal_pengajuan)='"  . date('Y') . "'")
+            ->whereBetween('tanggal_pengajuan', [$awalBulan, $akhirBulan])
             ->first();
 
         $leaderboard = DB::table("presensi")
@@ -114,12 +115,19 @@ class DashboardController extends Controller
             ->whereYear('tanggal_presensi', date('Y'))
             ->value('total');
 
-        // Flag hari libur pada 7 hari terakhir
+        // Flag hari libur pada 7 hari terakhir (1 query, bukan 7)
+        $hariLiburAll = HariLibur::all();
         $holidayDates = [];
         for ($i = 6; $i >= 0; $i--) {
-            $tgl = Carbon::now()->subDays($i)->format('Y-m-d');
-            if (HariLibur::isHoliday($tgl)) {
-                $holidayDates[] = $tgl;
+            $tgl = Carbon::now()->subDays($i);
+            $isHoliday = $hariLiburAll->contains(function ($h) use ($tgl) {
+                if ($h->is_recurring) {
+                    return $h->tanggal->month === $tgl->month && $h->tanggal->day === $tgl->day;
+                }
+                return $h->tanggal->format('Y-m-d') === $tgl->format('Y-m-d');
+            });
+            if ($isHoliday) {
+                $holidayDates[] = $tgl->format('Y-m-d');
             }
         }
 

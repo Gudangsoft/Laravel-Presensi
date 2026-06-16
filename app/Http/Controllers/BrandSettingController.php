@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BrandSetting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class BrandSettingController extends Controller
@@ -63,6 +64,7 @@ class BrandSettingController extends Controller
         }
 
         $brand->update($data);
+        Cache::forget('brand_setting');
 
         return redirect()->back()->with('success', 'Pengaturan brand berhasil disimpan.');
     }
