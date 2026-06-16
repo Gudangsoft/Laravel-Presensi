@@ -44,7 +44,11 @@
 <body>
 
     <div class="header">
-        <h1>REKAP PRESENSI KARYAWAN</h1>
+        @if ($brand?->logoPath())
+            <img src="{{ $brand->logoPath() }}" alt="logo" style="height:48px;object-fit:contain;margin-bottom:8px;">
+        @endif
+        <h1>{{ strtoupper($brand?->nama_aplikasi ?? config('app.name')) }}</h1>
+        <p style="font-size:13px;font-weight:700;color:#374151;margin-top:4px;">REKAP PRESENSI KARYAWAN</p>
         <p>Periode: {{ $bulanNama[$bulan] }} {{ $tahun }}</p>
     </div>
 

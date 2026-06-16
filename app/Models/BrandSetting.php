@@ -19,4 +19,10 @@ class BrandSetting extends Model
     {
         return $this->favicon ? asset('storage/brand/' . $this->favicon) : asset('img/favicon.png');
     }
+
+    /** Local filesystem path for DomPDF image rendering */
+    public function logoPath(): ?string
+    {
+        return $this->logo ? public_path('storage/brand/' . $this->logo) : null;
+    }
 }

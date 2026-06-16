@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Login &mdash; {{ $brand?->nama_aplikasi ?? 'Laravel Presensi' }}</title>
+    <title>Login &mdash; {{ $brand?->nama_aplikasi ?? config('app.name') }}</title>
     <link rel="icon" type="image/png" href="{{ $brand?->faviconUrl() ?? asset('img/favicon.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -40,7 +40,7 @@
                 @endif
             </div>
 
-            <h1 class="text-4xl font-extrabold text-white mb-3 tracking-tight">{{ $brand?->nama_aplikasi ?? 'Laravel Presensi' }}</h1>
+            <h1 class="text-4xl font-extrabold text-white mb-3 tracking-tight">{{ $brand?->nama_aplikasi ?? config('app.name') }}</h1>
             <p class="text-indigo-200 text-lg font-medium mb-2">{{ $brand?->tagline ?? 'Sistem Manajemen Kehadiran' }}</p>
             <p class="text-indigo-300 text-sm max-w-xs mx-auto leading-relaxed">Kelola presensi karyawan dengan mudah, akurat, dan real-time dari mana saja.</p>
 
@@ -68,7 +68,7 @@
         </div>
 
         {{-- Bottom credit --}}
-        <p class="absolute bottom-6 left-0 right-0 text-center text-indigo-300 text-xs">&copy; {{ date('Y') }} {{ $brand?->footer_text ?? 'Laravel Presensi' }}. All rights reserved.</p>
+        <p class="absolute bottom-6 left-0 right-0 text-center text-indigo-300 text-xs">&copy; {{ date('Y') }} {{ $brand?->footer_text ?? config('app.name') }}. All rights reserved.</p>
     </div>
 
     {{-- RIGHT: Form Section --}}
@@ -84,7 +84,7 @@
                         <i class="ri-fingerprint-line text-3xl text-white"></i>
                     @endif
                 </div>
-                <h1 class="text-2xl font-extrabold text-gray-800">{{ $brand?->nama_aplikasi ?? 'Laravel Presensi' }}</h1>
+                <h1 class="text-2xl font-extrabold text-gray-800">{{ $brand?->nama_aplikasi ?? config('app.name') }}</h1>
                 <p class="text-gray-500 text-sm mt-1">{{ $brand?->tagline ?? 'Sistem Manajemen Kehadiran' }}</p>
             </div>
 
@@ -211,7 +211,7 @@
 
             {{-- Footer note --}}
             <p class="text-center text-xs text-gray-400 mt-6">
-                &copy; {{ date('Y') }} {{ $brand?->footer_text ?? 'Laravel Presensi' }} &mdash; Hak Cipta Dilindungi
+                &copy; {{ date('Y') }} {{ $brand?->footer_text ?? config('app.name') }} &mdash; Hak Cipta Dilindungi
             </p>
         </div>
     </div>

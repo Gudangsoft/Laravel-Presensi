@@ -122,7 +122,7 @@
 
                     {{-- Footer --}}
                     <p class="text-center text-xs text-gray-400 mt-8">
-                        &copy; {{ date('Y') }} {{ $brand?->footer_text ?? 'Sistem Presensi Karyawan' }}
+                        &copy; {{ date('Y') }} {{ $brand?->footer_text ?? config('app.name') }}
                     </p>
                 </div>
             </div>

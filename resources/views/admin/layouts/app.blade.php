@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $brand?->nama_aplikasi ?? config('app.name', 'Laravel Presensi') }}</title>
+    <title>{{ $brand?->nama_aplikasi ?? config('app.name', config('app.name')) }}</title>
 
     <link rel="icon" type="image/png" href="{{ $brand?->faviconUrl() ?? asset('img/favicon.png') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -174,7 +174,7 @@
 
         {{-- ── Footer ── --}}
         <footer class="border-t border-gray-200 bg-white px-6 py-3 text-center text-xs text-gray-400">
-            © {{ date('Y') }} {{ $brand?->footer_text ?? 'Laravel Presensi' }}. All rights reserved.
+            © {{ date('Y') }} {{ $brand?->footer_text ?? config('app.name') }}. All rights reserved.
         </footer>
     </div>
 
