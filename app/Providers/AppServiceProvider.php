@@ -19,12 +19,12 @@ class AppServiceProvider extends ServiceProvider
         View::composer('*', function ($view) {
             try {
                 $view->with('brand', BrandSetting::first());
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $view->with('brand', null);
             }
             try {
                 $view->with('unreadNotifikasi', Notifikasi::unreadCount());
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $view->with('unreadNotifikasi', 0);
             }
         });
