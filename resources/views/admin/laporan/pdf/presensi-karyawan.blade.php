@@ -123,9 +123,9 @@
                 </td>
             </tr>
             <tr>
-                <td>NIK</td>
+                <td>Email</td>
                 <td>:</td>
-                <td>{{ $karyawan->nik }}</td>
+                <td>{{ $karyawan->email }}</td>
             </tr>
             <tr>
                 <td>Nama Karyawan</td>

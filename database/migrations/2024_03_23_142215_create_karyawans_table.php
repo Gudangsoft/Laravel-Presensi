@@ -6,13 +6,10 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('karyawan', function (Blueprint $table) {
-            $table->string('nik')->primary();
+            $table->id();
             $table->foreignId('departemen_id')->constrained('departemen', 'id');
             $table->string('nama_lengkap');
             $table->string('foto')->nullable();
@@ -25,9 +22,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('karyawan');

@@ -1,12 +1,22 @@
 <?php
 
+use App\Http\Controllers\AbsensiMassalController;
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AuthKaryawanController;
+use App\Http\Controllers\BackupController;
+use App\Http\Controllers\BrandSettingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartemenController;
+use App\Http\Controllers\HariLiburController;
 use App\Http\Controllers\KaryawanController;
+use App\Http\Controllers\KoreksiPresensiController;
 use App\Http\Controllers\LokasiKantorController;
+use App\Http\Controllers\NotifikasiController;
+use App\Http\Controllers\PengaturanController;
+use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\PresensiController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\QrSessionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -42,7 +52,7 @@ Route::group([
         'prefix' => 'presensi',
     ], function () {
         Route::get('/', [PresensiController::class, 'index'])->name('karyawan.presensi');
-        Route::post('/', [PresensiController::class, 'store'])->name('karyawan.presensi.store');
+        Route::post('/', [PresensiController::class, 'store'])->name('karyawan.presensi.store')->middleware('throttle:5,1');
 
         Route::group([
             'prefix' => 'history',
@@ -58,6 +68,9 @@ Route::group([
             Route::get('/pengajuan-presensi', [PresensiController::class, 'pengajuanPresensiCreate'])->name('karyawan.izin.create');
             Route::post('/pengajuan-presensi', [PresensiController::class, 'pengajuanPresensiStore'])->name('karyawan.izin.store');
             Route::post('/search-history', [PresensiController::class, 'searchPengajuanHistory'])->name('karyawan.izin.search');
+            Route::get('/koreksi', [KoreksiPresensiController::class, 'karyawanIndex'])->name('karyawan.koreksi');
+            Route::get('/koreksi/buat', [KoreksiPresensiController::class, 'create'])->name('karyawan.koreksi.create');
+            Route::post('/koreksi/buat', [KoreksiPresensiController::class, 'store'])->name('karyawan.koreksi.store');
         });
     });
 
@@ -66,7 +79,13 @@ Route::group([
     ], function () {
         Route::get('/', [KaryawanController::class, 'index'])->name('karyawan.profile');
         Route::post('/update', [KaryawanController::class, 'update'])->name('karyawan.profile.update');
+        Route::post('/ganti-password', [KaryawanController::class, 'changePassword'])->name('karyawan.profile.password');
     });
+
+    Route::get('/presensi/rekap-pdf', [PresensiController::class, 'rekapPdf'])->name('karyawan.presensi.rekap-pdf');
+
+    // QR scan (karyawan must be logged in)
+    Route::get('/scan/{token}', [QrSessionController::class, 'scan'])->name('karyawan.scan');
 });
 
 Route::group([
@@ -80,6 +99,9 @@ Route::group([
     Route::get('/karyawan/perbarui', [KaryawanController::class, 'edit'])->name('admin.karyawan.edit');
     Route::post('/karyawan/perbarui', [KaryawanController::class, 'updateAdmin'])->name('admin.karyawan.update');
     Route::post('/karyawan/hapus', [KaryawanController::class, 'delete'])->name('admin.karyawan.delete');
+    Route::get('/karyawan/export', [KaryawanController::class, 'export'])->name('admin.karyawan.export');
+    Route::get('/karyawan/template', [KaryawanController::class, 'template'])->name('admin.karyawan.template');
+    Route::post('/karyawan/import', [KaryawanController::class, 'import'])->name('admin.karyawan.import');
 
     Route::get('/departemen', [DepartemenController::class, 'index'])->name('admin.departemen');
     Route::post('/departemen/tambah', [DepartemenController::class, 'store'])->name('admin.departemen.store');
@@ -102,6 +124,60 @@ Route::group([
 
     Route::get('/administrasi-presensi', [PresensiController::class, 'indexAdmin'])->name('admin.administrasi-presensi');
     Route::post('/administrasi-presensi/status', [PresensiController::class, 'persetujuanPresensi'])->name('admin.administrasi-presensi.persetujuan');
+    Route::post('/administrasi-presensi/bulk', [PresensiController::class, 'bulkPersetujuanPresensi'])->name('admin.administrasi-presensi.bulk');
+
+    Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('admin.pengaturan');
+    Route::post('/pengaturan', [PengaturanController::class, 'update'])->name('admin.pengaturan.update');
+
+    Route::get('/brand', [BrandSettingController::class, 'index'])->name('admin.brand');
+    Route::post('/brand', [BrandSettingController::class, 'update'])->name('admin.brand.update');
+
+    // Dashboard real-time AJAX
+    Route::get('/dashboard/stats', [DashboardController::class, 'dashboardStats'])->name('admin.dashboard.stats');
+    Route::get('/dashboard/chart', [DashboardController::class, 'chartData'])->name('admin.dashboard.chart');
+
+    // Hari Libur
+    Route::get('/hari-libur', [HariLiburController::class, 'index'])->name('admin.hari-libur');
+    Route::post('/hari-libur/tambah', [HariLiburController::class, 'store'])->name('admin.hari-libur.store');
+    Route::post('/hari-libur/perbarui', [HariLiburController::class, 'update'])->name('admin.hari-libur.update');
+    Route::post('/hari-libur/hapus', [HariLiburController::class, 'delete'])->name('admin.hari-libur.delete');
+
+    // Log Aktivitas
+    Route::get('/activity-log', [ActivityLogController::class, 'index'])->name('admin.activity-log');
+    Route::post('/activity-log/clear', [ActivityLogController::class, 'clear'])->name('admin.activity-log.clear');
+
+    // QR Presensi
+    Route::get('/qr-presensi', [QrSessionController::class, 'adminIndex'])->name('admin.qr-presensi');
+    Route::post('/qr-presensi/generate', [QrSessionController::class, 'generate'])->name('admin.qr-presensi.generate');
+    Route::post('/qr-presensi/invalidate', [QrSessionController::class, 'invalidate'])->name('admin.qr-presensi.invalidate');
+
+    // Koreksi Presensi
+    Route::get('/koreksi-presensi', [KoreksiPresensiController::class, 'adminIndex'])->name('admin.koreksi-presensi');
+    Route::post('/koreksi-presensi/setujui', [KoreksiPresensiController::class, 'approve'])->name('admin.koreksi-presensi.approve');
+    Route::post('/koreksi-presensi/tolak', [KoreksiPresensiController::class, 'reject'])->name('admin.koreksi-presensi.reject');
+
+    // Notifikasi
+    Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('admin.notifikasi');
+    Route::get('/notifikasi/unread-count', [NotifikasiController::class, 'unreadCount'])->name('admin.notifikasi.count');
+    Route::get('/notifikasi/recent', [NotifikasiController::class, 'recent'])->name('admin.notifikasi.recent');
+    Route::post('/notifikasi/baca-semua', [NotifikasiController::class, 'markAllRead'])->name('admin.notifikasi.baca-semua');
+
+    // Backup
+    Route::get('/backup', [BackupController::class, 'index'])->name('admin.backup');
+    Route::post('/backup/run', [BackupController::class, 'run'])->name('admin.backup.run');
+    Route::get('/backup/download/{filename}', [BackupController::class, 'download'])->name('admin.backup.download')->where('filename', '.*');
+    Route::post('/backup/delete', [BackupController::class, 'delete'])->name('admin.backup.delete');
+
+    // Pengumuman
+    Route::get('/pengumuman', [PengumumanController::class, 'index'])->name('admin.pengumuman');
+    Route::post('/pengumuman/tambah', [PengumumanController::class, 'store'])->name('admin.pengumuman.store');
+    Route::post('/pengumuman/perbarui', [PengumumanController::class, 'update'])->name('admin.pengumuman.update');
+    Route::post('/pengumuman/hapus', [PengumumanController::class, 'delete'])->name('admin.pengumuman.delete');
+    Route::post('/pengumuman/toggle', [PengumumanController::class, 'toggle'])->name('admin.pengumuman.toggle');
+
+    // Absensi Massal
+    Route::get('/absensi-massal', [AbsensiMassalController::class, 'index'])->name('admin.absensi-massal');
+    Route::post('/absensi-massal', [AbsensiMassalController::class, 'store'])->name('admin.absensi-massal.store');
 });
 
 require __DIR__.'/auth.php';

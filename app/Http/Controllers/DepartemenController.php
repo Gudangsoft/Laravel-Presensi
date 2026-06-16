@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Departemen;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -32,6 +33,7 @@ class DepartemenController extends Controller
         $create = Departemen::create($data);
 
         if ($create) {
+            ActivityLog::record('tambah_departemen', 'Menambahkan departemen: ' . $create->nama . ' (' . $create->kode . ')');
             return to_route('admin.departemen')->with('success', 'Data Departemen berhasil disimpan');
         } else {
             return to_route('admin.departemen')->with('error', 'Data Departemen gagal disimpan');
@@ -55,6 +57,7 @@ class DepartemenController extends Controller
         $update = Departemen::where('id', $request->id)->update($data);
 
         if ($update) {
+            ActivityLog::record('ubah_departemen', 'Memperbarui departemen: ' . $departemen->nama . ' → ' . $data['nama']);
             return to_route('admin.departemen')->with('success', 'Data Departemen berhasil diperbarui');
         } else {
             return to_route('admin.departemen')->with('error', 'Data Departemen gagal diperbarui');
@@ -63,9 +66,11 @@ class DepartemenController extends Controller
 
     public function delete(Request $request)
     {
+        $dept   = Departemen::find($request->id);
         $delete = Departemen::where('id', $request->id)->delete();
 
         if ($delete) {
+            ActivityLog::record('hapus_departemen', 'Menghapus departemen: ' . ($dept->nama ?? 'ID ' . $request->id));
             return response()->json(['success' => true, 'message' => 'Data Departemen Berhasil dihapus']);
         } else {
             return response()->json(['success' => false, 'message' => 'Data Departemen Gagal dihapus']);

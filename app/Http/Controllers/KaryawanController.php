@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\KaryawanExport;
+use App\Exports\KaryawanTemplateExport;
+use App\Imports\KaryawanImport;
+use App\Models\ActivityLog;
 use App\Models\Departemen;
 use App\Models\Karyawan;
 use Illuminate\Http\Request;
@@ -9,53 +13,73 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 
 class KaryawanController extends Controller
 {
     public function index()
     {
         $title = "Profile";
-        $karyawan = Karyawan::where('nik', auth()->guard('karyawan')->user()->nik)->first();
+        $karyawan = auth()->guard('karyawan')->user();
         return view('dashboard.profile.index', compact('title', 'karyawan'));
     }
 
     public function update(Request $request)
     {
-        $karyawan = Karyawan::where('nik', auth()->guard('karyawan')->user()->nik)->first();
+        $karyawan = auth()->guard('karyawan')->user();
 
-        if ($request->hasFile('foto')) {
-            $foto = $karyawan->nik . "." . $request->file('foto')->getClientOriginalExtension();
-        } else {
-            $foto = $karyawan->foto;
+        $request->validate([
+            'nama_lengkap' => 'required|string|max:255',
+            'telepon'      => 'required|string|max:15',
+            'email'        => ['required', 'email', Rule::unique('karyawan')->ignore($karyawan->id)],
+            'foto'         => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $foto = $karyawan->foto;
+
+        // Cropped base64 avatar takes priority
+        if ($request->filled('foto_cropped')) {
+            $base64 = preg_replace('/^data:image\/\w+;base64,/', '', $request->foto_cropped);
+            $foto   = $karyawan->id . '.jpg';
+            Storage::put("public/unggah/karyawan/{$foto}", base64_decode($base64));
+        } elseif ($request->hasFile('foto')) {
+            $foto = $karyawan->id . '.' . $request->file('foto')->getClientOriginalExtension();
+            $request->file('foto')->storeAs('public/unggah/karyawan/', $foto);
         }
 
-        if ($request->password != null) {
-            $update = Karyawan::where('nik', auth()->guard('karyawan')->user()->nik)->update([
-                'nama_lengkap' => $request->nama_lengkap,
-                'telepon' => $request->telepon,
-                'password' => Hash::make($request->password),
-                'foto' => $foto,
-                'updated_at' => Carbon::now(),
-            ]);
+        Karyawan::where('id', $karyawan->id)->update([
+            'nama_lengkap' => $request->nama_lengkap,
+            'telepon'      => $request->telepon,
+            'email'        => $request->email,
+            'foto'         => $foto,
+            'updated_at'   => Carbon::now(),
+        ]);
 
-        } elseif ($request->password == null) {
-            $update = Karyawan::where('nik', auth()->guard('karyawan')->user()->nik)->update([
-                'nama_lengkap' => $request->nama_lengkap,
-                'telepon' => $request->telepon,
-                'foto' => $foto,
-                'updated_at' => Carbon::now(),
-            ]);
+        return redirect()->back()->with('success', 'Profil berhasil diperbarui.');
+    }
+
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'current_password'      => 'required',
+            'new_password'          => 'required|min:6|confirmed',
+        ], [
+            'new_password.confirmed' => 'Konfirmasi password baru tidak cocok.',
+            'new_password.min'       => 'Password minimal 6 karakter.',
+        ]);
+
+        $karyawan = auth()->guard('karyawan')->user();
+
+        if (!Hash::check($request->current_password, $karyawan->password)) {
+            return redirect()->back()->with('password_error', 'Password lama tidak sesuai.');
         }
 
-        if ($update) {
-            if ($request->hasFile('foto')) {
-                $folderPath = "public/unggah/karyawan/";
-                $request->file('foto')->storeAs($folderPath, $foto);
-            }
-            return redirect()->back()->with('success', 'Profile updated successfully');
-        } else {
-            return redirect()->back()->with('error', 'Profile updated failed');
-        }
+        Karyawan::where('id', $karyawan->id)->update([
+            'password'   => Hash::make($request->new_password),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        return redirect()->back()->with('password_success', 'Password berhasil diubah.');
     }
 
     public function indexAdmin(Request $request)
@@ -64,13 +88,18 @@ class KaryawanController extends Controller
 
         $departemen = Departemen::get();
 
-        $query = Karyawan::join('departemen as d', 'karyawan.departemen_id', '=', 'd.id')->select('karyawan.*', 'd.kode')->orderBy('d.kode', 'asc')->orderBy('karyawan.nama_lengkap', 'asc');
+        $query = Karyawan::join('departemen as d', 'karyawan.departemen_id', '=', 'd.id')
+            ->select('karyawan.*', 'd.kode')
+            ->orderBy('d.kode', 'asc')
+            ->orderBy('karyawan.nama_lengkap', 'asc');
+
         if ($request->nama_karyawan) {
-            $query->where('karyawan.nama_lengkap', 'like', '%'.$request->nama_karyawan.'%');
+            $query->where('karyawan.nama_lengkap', 'like', '%' . $request->nama_karyawan . '%');
         }
         if ($request->kode_departemen) {
-            $query->where('d.kode', 'like', '%'.$request->kode_departemen.'%');
+            $query->where('d.kode', 'like', '%' . $request->kode_departemen . '%');
         }
+
         $karyawan = $query->paginate(10);
 
         return view('admin.karyawan.index', compact('title', 'karyawan', 'departemen'));
@@ -79,27 +108,26 @@ class KaryawanController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'nik' => 'required|unique:karyawan,nik',
             'departemen_id' => 'required',
-            'nama_lengkap' => 'required|string|max:255',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'jabatan' => 'required|string|max:255',
-            'telepon' => 'required|string|max:15',
-            'email' => 'required|string|email|max:255|unique:karyawan,email',
-            'password' => 'required',
+            'nama_lengkap'  => 'required|string|max:255',
+            'foto'          => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'jabatan'       => 'required|string|max:255',
+            'telepon'       => 'required|string|max:15',
+            'email'         => 'required|string|email|max:255|unique:karyawan,email',
+            'password'      => 'required',
         ]);
         $data['password'] = Hash::make($data['password']);
-        if ($request->hasFile('foto')) {
-            $foto = $request->nik . "." . $request->file('foto')->getClientOriginalExtension();
-        }
+        unset($data['foto']);
 
         $create = Karyawan::create($data);
 
         if ($create) {
             if ($request->hasFile('foto')) {
-                $folderPath = "public/unggah/karyawan/";
-                $request->file('foto')->storeAs($folderPath, $foto);
+                $foto = $create->id . "." . $request->file('foto')->getClientOriginalExtension();
+                $create->update(['foto' => $foto]);
+                $request->file('foto')->storeAs("public/unggah/karyawan/", $foto);
             }
+            ActivityLog::record('tambah_karyawan', 'Menambahkan karyawan: ' . $create->nama_lengkap);
             return to_route('admin.karyawan')->with('success', 'Data Karyawan berhasil disimpan');
         } else {
             return to_route('admin.karyawan')->with('error', 'Data Karyawan gagal disimpan');
@@ -108,33 +136,41 @@ class KaryawanController extends Controller
 
     public function edit(Request $request)
     {
-        $data = Karyawan::where('nik', $request->nik)->first();
+        $data = Karyawan::where('id', $request->id)->first();
         return $data;
     }
 
     public function updateAdmin(Request $request)
     {
-        $karyawan = Karyawan::where('nik', $request->nik_lama)->first();
+        $karyawan = Karyawan::where('id', $request->id)->first();
+
         $data = $request->validate([
-            'nik' => ['required', Rule::unique('karyawan')->ignore($karyawan)],
             'departemen_id' => 'required',
-            'nama_lengkap' => 'required|string|max:255',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'jabatan' => 'required|string|max:255',
-            'telepon' => 'required|string|max:15',
-            'email' => ['required', 'email', Rule::unique('karyawan')->ignore($karyawan)],
+            'nama_lengkap'  => 'required|string|max:255',
+            'foto'          => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'jabatan'       => 'required|string|max:255',
+            'telepon'       => 'required|string|max:15',
+            'email'         => ['required', 'email', Rule::unique('karyawan')->ignore($karyawan)],
+            'password'      => 'nullable|string|min:6',
         ]);
+
         if ($request->hasFile('foto')) {
-            $data['foto'] = $request->nik . "." . $request->file('foto')->getClientOriginalExtension();
+            $data['foto'] = $karyawan->id . "." . $request->file('foto')->getClientOriginalExtension();
         }
 
-        $update = Karyawan::where('nik', $request->nik_lama)->update($data);
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        } else {
+            unset($data['password']);
+        }
+
+        $update = Karyawan::where('id', $request->id)->update($data);
 
         if ($update) {
             if ($request->hasFile('foto')) {
-                $folderPath = "public/unggah/karyawan/";
-                $request->file('foto')->storeAs($folderPath, $data['foto']);
+                $request->file('foto')->storeAs("public/unggah/karyawan/", $data['foto']);
             }
+            ActivityLog::record('ubah_karyawan', 'Memperbarui karyawan: ' . $karyawan->nama_lengkap);
             return to_route('admin.karyawan')->with('success', 'Data Karyawan berhasil diperbarui');
         } else {
             return to_route('admin.karyawan')->with('error', 'Data Karyawan gagal diperbarui');
@@ -143,17 +179,50 @@ class KaryawanController extends Controller
 
     public function delete(Request $request)
     {
-        $data = Karyawan::where('nik', $request->nik)->first();
-        $delete = Karyawan::where('nik', $request->nik)->delete();
+        $data   = Karyawan::where('id', $request->id)->first();
+        $delete = Karyawan::where('id', $request->id)->delete();
+
         if ($delete && $data->foto) {
-            $folderPath = "public/unggah/karyawan/";
-            Storage::delete($folderPath . $data->foto);
+            Storage::delete("public/unggah/karyawan/" . $data->foto);
         }
 
         if ($delete) {
-            return response()->json(['success' => true, 'message' => 'Data Karyawan Berhasil dihapus']);
+            ActivityLog::record('hapus_karyawan', 'Menghapus karyawan: ' . ($data->nama_lengkap ?? 'ID ' . $request->id));
+            return response()->json(['success' => true,  'message' => 'Data Karyawan Berhasil dihapus']);
         } else {
             return response()->json(['success' => false, 'message' => 'Data Karyawan Gagal dihapus']);
         }
+    }
+
+    public function export(Request $request)
+    {
+        $departemenId = $request->departemen_id ? (int) $request->departemen_id : null;
+        return Excel::download(new KaryawanExport($departemenId), 'data-karyawan-' . date('Y-m-d') . '.xlsx');
+    }
+
+    public function template()
+    {
+        return Excel::download(new KaryawanTemplateExport(), 'template-import-karyawan.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:2048',
+        ], [
+            'file.required' => 'Pilih file Excel terlebih dahulu.',
+            'file.mimes'    => 'Format file harus xlsx, xls, atau csv.',
+            'file.max'      => 'Ukuran file maksimal 2MB.',
+        ]);
+
+        $import = new KaryawanImport();
+        Excel::import($import, $request->file('file'));
+
+        $errors = $import->errors();
+        if ($errors->isNotEmpty()) {
+            return to_route('admin.karyawan')->with('error', 'Import selesai dengan ' . $errors->count() . ' error.');
+        }
+
+        return to_route('admin.karyawan')->with('success', 'Data karyawan berhasil diimport.');
     }
 }

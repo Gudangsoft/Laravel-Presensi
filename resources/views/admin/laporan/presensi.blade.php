@@ -7,37 +7,94 @@
         </div>
     </x-slot>
 
-    <div class="container mx-auto px-5 pt-5">
-        <div class="w-full rounded-md bg-slate-200 px-10 mb-10">
-            <h1 class="py-3 font-bold text-xl">Laporan Presensi Karyawan</h1>
-            <form action="{{ route("admin.laporan.presensi.karyawan") }}" method="post" target="_blank" enctype="multipart/form-data" class="pb-3">
-                @csrf
-                <div class="flex w-full flex-wrap gap-2 lg:flex-nowrap">
-                    <input type="month" name="bulan" class="input input-bordered w-full" value="{{ Carbon\Carbon::now()->format("Y-m") }}" required />
-                    <select name="karyawan" class="select select-bordered w-full text-blue-700" required>
-                        <option disabled selected>Pilih karyawan!</option>
-                        @foreach ($karyawan as $item)
-                            <option value="{{ $item->nik }}">{{ $item->nama_lengkap }}</option>
-                        @endforeach
-                    </select>
-                    <button type="submit" class="btn btn-error w-full lg:w-14">
-                        <i class="ri-file-pdf-2-fill text-lg text-white"></i>
-                    </button>
-                </div>
-            </form>
-        </div>
+    <div class="container mx-auto px-5 pt-6 pb-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-        <div class="w-full rounded-md bg-slate-200 px-10">
-            <h1 class="py-3 font-bold text-xl">Laporan Presensi Semua Karyawan</h1>
-            <form action="{{ route("admin.laporan.presensi.semua-karyawan") }}" method="post" target="_blank" enctype="multipart/form-data" class="pb-3">
-                @csrf
-                <div class="flex w-full flex-wrap gap-2 lg:flex-nowrap">
-                    <input type="month" name="bulan" class="input input-bordered w-full" value="{{ Carbon\Carbon::now()->format("Y-m") }}" required />
-                    <button type="submit" class="btn btn-error w-full lg:w-14">
-                        <i class="ri-file-pdf-2-fill text-lg text-white"></i>
-                    </button>
+            {{-- Card 1: Laporan Per Karyawan --}}
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="flex-shrink-0 w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center">
+                        <i class="ri-user-line text-2xl text-indigo-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-semibold text-gray-800">Laporan Per Karyawan</h3>
+                        <p class="text-sm text-gray-500">Export laporan presensi satu karyawan</p>
+                    </div>
                 </div>
-            </form>
+
+                <form action="{{ route("admin.laporan.presensi.karyawan") }}" method="post" target="_blank" enctype="multipart/form-data">
+                    @csrf
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Pilih Bulan</label>
+                            <input
+                                type="month"
+                                name="bulan"
+                                value="{{ Carbon\Carbon::now()->format("Y-m") }}"
+                                required
+                                class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Pilih Karyawan</label>
+                            <select
+                                name="karyawan"
+                                required
+                                class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-white"
+                            >
+                                <option disabled selected value="">-- Pilih karyawan --</option>
+                                @foreach ($karyawan as $item)
+                                    <option value="{{ $item->id }}">{{ $item->nama_lengkap }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <button
+                            type="submit"
+                            class="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-4 py-2.5 text-sm font-medium transition duration-150"
+                        >
+                            <i class="ri-file-pdf-line text-base"></i>
+                            Export PDF
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            {{-- Card 2: Laporan Semua Karyawan --}}
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center">
+                        <i class="ri-team-line text-2xl text-purple-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-semibold text-gray-800">Laporan Semua Karyawan</h3>
+                        <p class="text-sm text-gray-500">Export laporan presensi seluruh karyawan</p>
+                    </div>
+                </div>
+
+                <form action="{{ route("admin.laporan.presensi.semua-karyawan") }}" method="post" target="_blank" enctype="multipart/form-data">
+                    @csrf
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Pilih Bulan</label>
+                            <input
+                                type="month"
+                                name="bulan"
+                                value="{{ Carbon\Carbon::now()->format("Y-m") }}"
+                                required
+                                class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                            />
+                        </div>
+                        <button
+                            type="submit"
+                            class="w-full flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl px-4 py-2.5 text-sm font-medium transition duration-150"
+                        >
+                            <i class="ri-file-pdf-line text-base"></i>
+                            Export PDF
+                        </button>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
 </x-app-layout>

@@ -4,171 +4,307 @@
             <h2 class="text-xl font-semibold leading-tight text-gray-800">
                 {{ __("Data Departemen") }}
             </h2>
-            <label class="btn btn-primary btn-sm" for="create_modal">Tambah Data</label>
+            <button onclick="document.getElementById('create_modal').classList.remove('hidden')"
+                class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-4 py-2 font-medium text-sm transition-colors duration-150">
+                <i class="ri-add-line text-base"></i>
+                Tambah Departemen
+            </button>
         </div>
     </x-slot>
 
     <div class="container mx-auto px-5 pt-5">
-        <div>
-            <form action="{{ route("admin.departemen") }}" method="get" enctype="multipart/form-data" class="my-3">
+
+        {{-- Search & Table Card --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+
+            {{-- Search Bar --}}
+            <form action="{{ route('admin.departemen') }}" method="get" class="mb-5">
                 <div class="flex w-full flex-wrap gap-2 md:flex-nowrap">
-                    <input type="text" name="cari_departemen" placeholder="Pencarian" class="input input-bordered w-full" value="{{ request()->cari_departemen }}" />
-                    <button type="submit" class="btn btn-success w-full md:w-14">
-                        <i class="ri-search-2-line text-lg text-white"></i>
+                    <div class="relative flex-1">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <i class="ri-search-2-line text-base"></i>
+                        </span>
+                        <input
+                            type="text"
+                            name="cari_departemen"
+                            placeholder="Cari departemen..."
+                            class="w-full border border-gray-300 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                            value="{{ request()->cari_departemen }}"
+                        />
+                    </div>
+                    <button type="submit"
+                        class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-5 py-2.5 font-medium text-sm transition-colors duration-150">
+                        <i class="ri-search-2-line text-base"></i>
+                        Cari
                     </button>
                 </div>
             </form>
-        </div>
-        <div class="w-full overflow-x-auto rounded-md bg-slate-200 px-10">
-            <table id="tabelPresensi" class="table mb-4 w-full border-collapse items-center border-gray-200 align-top dark:border-white/40">
-                <thead class="text-sm text-gray-800 dark:text-gray-300">
-                    <tr>
-                        <th></th>
-                        <th>Kode</th>
-                        <th>Nama</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($departemen as $value => $item)
-                        <tr class="hover">
-                            <td class="font-bold">{{ $departemen ->firstItem() + $value }}</td>
-                            <td class="text-slate-500 dark:text-slate-300">{{ $item->kode }}</td>
-                            <td class="text-slate-500 dark:text-slate-300">{{ $item->nama }}</td>
-                            <td>
-                                <label class="btn btn-warning btn-sm" for="edit_button" onclick="return edit_button('{{ $item->id }}')">
-                                    <i class="ri-pencil-fill"></i>
-                                </label>
-                                <label class="btn btn-error btn-sm" onclick="return delete_button('{{ $item->id }}', '{{ $item->nama }}')">
-                                    <i class="ri-delete-bin-line"></i>
-                                </label>
-                            </td>
+
+            {{-- Table --}}
+            <div class="w-full overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-100">
+                            <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider rounded-tl-xl w-12">No</th>
+                            <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Kode Departemen</th>
+                            <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Nama Departemen</th>
+                            <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider rounded-tr-xl text-center">Aksi</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            <div class="mx-3 mb-5">
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        @foreach ($departemen as $value => $item)
+                            <tr class="hover:bg-gray-50 transition-colors duration-100">
+                                <td class="px-4 py-3.5 text-gray-500 font-medium">
+                                    {{ $departemen->firstItem() + $value }}
+                                </td>
+                                <td class="px-4 py-3.5">
+                                    <span class="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">
+                                        {{ $item->kode }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3.5 text-gray-700 font-medium">{{ $item->nama }}</td>
+                                <td class="px-4 py-3.5">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <button
+                                            onclick="return edit_button('{{ $item->id }}')"
+                                            class="inline-flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100 text-amber-600 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors duration-150 border border-amber-200">
+                                            <i class="ri-pencil-fill text-sm"></i>
+                                            Edit
+                                        </button>
+                                        <button
+                                            onclick="return delete_button('{{ $item->id }}', '{{ $item->nama }}')"
+                                            class="inline-flex items-center gap-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors duration-150 border border-red-200">
+                                            <i class="ri-delete-bin-line text-sm"></i>
+                                            Hapus
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+
+                        @if ($departemen->isEmpty())
+                            <tr>
+                                <td colspan="4" class="px-4 py-12 text-center text-gray-400">
+                                    <div class="flex flex-col items-center gap-2">
+                                        <i class="ri-inbox-2-line text-4xl"></i>
+                                        <span class="text-sm">Tidak ada data departemen</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endif
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- Pagination --}}
+            <div class="mt-5 pt-4 border-t border-gray-100">
                 {{ $departemen->links() }}
             </div>
+
         </div>
     </div>
 
-    {{-- Awal Modal Create --}}
-    <input type="checkbox" id="create_modal" class="modal-toggle" />
-    <div class="modal" role="dialog">
-        <div class="modal-box">
-            <div class="mb-3 flex justify-between">
-                <h3 class="text-lg font-bold">Tambah {{ $title }}</h3>
-                <label for="create_modal" class="cursor-pointer">
-                    <i class="ri-close-large-fill"></i>
-                </label>
+    {{-- ===================== Modal Create ===================== --}}
+    <div id="create_modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+        {{-- Backdrop --}}
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"
+             onclick="document.getElementById('create_modal').classList.add('hidden')"></div>
+
+        {{-- Modal Box --}}
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 z-10">
+            {{-- Header --}}
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
+                        <i class="ri-building-line text-indigo-600 text-base"></i>
+                    </div>
+                    <h3 class="text-base font-semibold text-gray-800">Tambah {{ $title }}</h3>
+                </div>
+                <button onclick="document.getElementById('create_modal').classList.add('hidden')"
+                    class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="ri-close-line text-lg"></i>
+                </button>
             </div>
-            <div>
-                <form action="{{ route("admin.departemen.store") }}" method="POST" enctype="multipart/form-data">
+
+            {{-- Body --}}
+            <div class="px-6 py-5">
+                <form action="{{ route('admin.departemen.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    <button type="reset" class="btn btn-neutral btn-sm">Reset</button>
-                    <label class="form-control w-full">
-                        <div class="label">
-                            <span class="label-text font-semibold">
-                                <span class="label-text font-semibold">Kode<span class="text-red-500">*</span></span>
-                            </span>
-                        </div>
-                        <input type="text" name="kode" placeholder="Kode" class="input input-bordered w-full text-blue-700" value="{{ old("kode") }}" required />
-                        @error("kode")
-                            <div class="label">
-                                <span class="label-text-alt text-sm text-error">{{ $message }}</span>
-                            </div>
+
+                    {{-- Kode --}}
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                            Kode <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="kode"
+                            placeholder="Contoh: DEP-001"
+                            class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                            value="{{ old('kode') }}"
+                            required
+                        />
+                        @error('kode')
+                            <p class="mt-1.5 text-xs text-red-500 flex items-center gap-1">
+                                <i class="ri-error-warning-line"></i> {{ $message }}
+                            </p>
                         @enderror
-                    </label>
-                    <label class="form-control w-full">
-                        <div class="label">
-                            <span class="label-text font-semibold">
-                                <span class="label-text font-semibold">Nama<span class="text-red-500">*</span></span>
-                            </span>
-                        </div>
-                        <input type="text" name="nama" placeholder="Nama" class="input input-bordered w-full text-blue-700" value="{{ old("nama") }}" required />
-                        @error("nama")
-                            <div class="label">
-                                <span class="label-text-alt text-sm text-error">{{ $message }}</span>
-                            </div>
+                    </div>
+
+                    {{-- Nama --}}
+                    <div class="mb-5">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                            Nama <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="nama"
+                            placeholder="Nama departemen"
+                            class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                            value="{{ old('nama') }}"
+                            required
+                        />
+                        @error('nama')
+                            <p class="mt-1.5 text-xs text-red-500 flex items-center gap-1">
+                                <i class="ri-error-warning-line"></i> {{ $message }}
+                            </p>
                         @enderror
-                    </label>
-                    <button type="submit" class="btn btn-success mt-3 w-full text-white">Simpan</button>
+                    </div>
+
+                    {{-- Actions --}}
+                    <div class="flex gap-3">
+                        <button type="reset"
+                            class="flex-1 border border-gray-300 text-gray-600 hover:bg-gray-50 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors">
+                            Reset
+                        </button>
+                        <button type="submit"
+                            class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-4 py-2.5 text-sm font-medium transition-colors">
+                            Simpan
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
-    {{-- Akhir Modal Create --}}
+    {{-- ===================== End Modal Create ===================== --}}
 
-    {{-- Awal Modal Edit --}}
-    <input type="checkbox" id="edit_button" class="modal-toggle" />
-    <div class="modal" role="dialog">
-        <div class="modal-box">
-            <div class="mb-3 flex justify-between">
-                <h3 class="text-lg font-bold">Ubah {{ $title }}</h3>
-                <label for="edit_button" class="cursor-pointer">
-                    <i class="ri-close-large-fill"></i>
-                </label>
+    {{-- ===================== Modal Edit ===================== --}}
+    <div id="edit_modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+        {{-- Backdrop --}}
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"
+             onclick="document.getElementById('edit_modal').classList.add('hidden')"></div>
+
+        {{-- Modal Box --}}
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 z-10">
+            {{-- Header --}}
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+                        <i class="ri-pencil-line text-amber-600 text-base"></i>
+                    </div>
+                    <h3 class="text-base font-semibold text-gray-800">Ubah {{ $title }}</h3>
+                </div>
+                <button onclick="document.getElementById('edit_modal').classList.add('hidden')"
+                    class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="ri-close-line text-lg"></i>
+                </button>
             </div>
-            <div>
-                <form action="{{ route("admin.departemen.update") }}" method="POST" enctype="multipart/form-data">
+
+            {{-- Body --}}
+            <div class="px-6 py-5">
+                <form action="{{ route('admin.departemen.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <input type="text" name="id" hidden>
-                    <label class="form-control w-full">
-                        <div class="label">
-                            <span class="label-text font-semibold">Kode<span class="text-red-500">*</span></span>
-                            <span class="label-text-alt" id="loading_edit1"></span>
+
+                    {{-- Kode --}}
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-sm font-semibold text-gray-700">
+                                Kode <span class="text-red-500">*</span>
+                            </label>
+                            <span id="loading_edit1" class="text-xs text-indigo-500"></span>
                         </div>
-                        <input type="text" name="kode" placeholder="Kode" class="input input-bordered w-full text-blue-700" required />
-                        @error("kode")
-                            <div class="label">
-                                <span class="label-text-alt text-sm text-error">{{ $message }}</span>
-                            </div>
+                        <input
+                            type="text"
+                            name="kode"
+                            placeholder="Kode departemen"
+                            class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                            required
+                        />
+                        @error('kode')
+                            <p class="mt-1.5 text-xs text-red-500 flex items-center gap-1">
+                                <i class="ri-error-warning-line"></i> {{ $message }}
+                            </p>
                         @enderror
-                    </label>
-                    <label class="form-control w-full">
-                        <div class="label">
-                            <span class="label-text font-semibold">Nama<span class="text-red-500">*</span></span>
-                            <span class="label-text-alt" id="loading_edit2"></span>
+                    </div>
+
+                    {{-- Nama --}}
+                    <div class="mb-5">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-sm font-semibold text-gray-700">
+                                Nama <span class="text-red-500">*</span>
+                            </label>
+                            <span id="loading_edit2" class="text-xs text-indigo-500"></span>
                         </div>
-                        <input type="text" name="nama" placeholder="Nama" class="input input-bordered w-full text-blue-700" required />
-                        @error("nama")
-                            <div class="label">
-                                <span class="label-text-alt text-sm text-error">{{ $message }}</span>
-                            </div>
+                        <input
+                            type="text"
+                            name="nama"
+                            placeholder="Nama departemen"
+                            class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                            required
+                        />
+                        @error('nama')
+                            <p class="mt-1.5 text-xs text-red-500 flex items-center gap-1">
+                                <i class="ri-error-warning-line"></i> {{ $message }}
+                            </p>
                         @enderror
-                    </label>
-                    <button type="submit" class="btn btn-warning mt-3 w-full text-slate-700">Perbarui</button>
+                    </div>
+
+                    {{-- Actions --}}
+                    <div class="flex gap-3">
+                        <button type="button"
+                            onclick="document.getElementById('edit_modal').classList.add('hidden')"
+                            class="flex-1 border border-gray-300 text-gray-600 hover:bg-gray-50 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors">
+                            Batal
+                        </button>
+                        <button type="submit"
+                            class="flex-1 bg-amber-500 hover:bg-amber-600 text-white rounded-xl px-4 py-2.5 text-sm font-medium transition-colors">
+                            Perbarui
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
-    {{-- Akhir Modal Edit --}}
+    {{-- ===================== End Modal Edit ===================== --}}
 
     <script>
-        @if (session()->has("success"))
+        @if (session()->has('success'))
             Swal.fire({
                 title: 'Berhasil',
-                text: '{{ session("success") }}',
+                text: '{{ session('success') }}',
                 icon: 'success',
-                confirmButtonColor: '#6419E6',
+                confirmButtonColor: '#4F46E5',
                 confirmButtonText: 'OK',
             });
         @endif
 
-        @if (session()->has("error"))
+        @if (session()->has('error'))
             Swal.fire({
                 title: 'Gagal',
-                text: '{{ session("error") }}',
+                text: '{{ session('error') }}',
                 icon: 'error',
-                confirmButtonColor: '#6419E6',
+                confirmButtonColor: '#4F46E5',
                 confirmButtonText: 'OK',
             });
         @endif
 
         function edit_button(id) {
+            // Buka modal edit
+            document.getElementById('edit_modal').classList.remove('hidden');
+
             // Loading effect start
-            let loading = `<span class="loading loading-dots loading-md text-purple-600"></span>`;
+            let loading = `<span class="loading loading-dots loading-md text-indigo-600"></span>`;
             $("#loading_edit1").html(loading);
             $("#loading_edit2").html(loading);
 
@@ -180,7 +316,6 @@
                     "id": id
                 },
                 success: function(data) {
-                    // console.log(data);
                     let items = [];
                     $.each(data, function(key, val) {
                         items.push(val);
@@ -189,7 +324,6 @@
                     $("input[name='id']").val(items[0]);
                     $("input[name='kode']").val(items[1]);
                     $("input[name='nama']").val(items[2]);
-
 
                     // Loading effect end
                     loading = "";
@@ -203,14 +337,14 @@
             Swal.fire({
                 title: 'Apakah Anda yakin?',
                 html: "<p>Data yang dihapus tidak dapat dipulihkan kembali!</p>" +
-                    "<div class='divider'></div>" +
+                    "<hr class='my-3 border-gray-200'>" +
                     "<div class='flex flex-col'>" +
-                    "<b>Karyawan: " + nama + "</b>" +
+                    "<b>Departemen: " + nama + "</b>" +
                     "</div>",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#6419E6',
-                cancelButtonColor: '#F87272',
+                confirmButtonColor: '#4F46E5',
+                cancelButtonColor: '#EF4444',
                 confirmButtonText: 'Hapus',
                 cancelButtonText: 'Batal',
             }).then((result) => {
@@ -227,7 +361,7 @@
                                 title: 'Berhasil',
                                 text: response.message,
                                 icon: 'success',
-                                confirmButtonColor: '#6419E6',
+                                confirmButtonColor: '#4F46E5',
                                 confirmButtonText: 'OK'
                             }).then((result) => {
                                 if (result.isConfirmed) {
@@ -240,11 +374,11 @@
                                 icon: 'error',
                                 title: 'Gagal',
                                 text: response.responseJSON.message
-                            })
+                            });
                         }
                     });
                 }
-            })
+            });
         }
     </script>
 </x-app-layout>

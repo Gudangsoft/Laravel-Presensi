@@ -16,10 +16,6 @@ class LokasiKantorController extends Controller
 
     public function store(Request $request)
     {
-        if ($request->is_used == LokasiKantor::where('is_used', true)->first()->is_used) {
-            return to_route('admin.lokasi-kantor')->with('error', "Data Lokasi Kantor yang digunakan sudah ada, silakan pilih is_used dengan tidak");
-        }
-
         $data = $request->validate([
             'kota' => 'required|string|max:255',
             'alamat' => 'required|string|max:255',
@@ -54,10 +50,6 @@ class LokasiKantorController extends Controller
             'radius' => 'required|numeric',
             'is_used' => 'required|boolean',
         ]);
-
-        if ($request->is_used == true) {
-            LokasiKantor::where('is_used', true)->update(['is_used' => false]);
-        }
 
         $update = LokasiKantor::where('id', $request->id)->update($data);
 

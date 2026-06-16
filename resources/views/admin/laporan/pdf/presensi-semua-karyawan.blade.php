@@ -129,7 +129,7 @@
                             {{ $value + 1 . "." }}
                         </td>
                         <td>
-                            {{ $item->nama_karyawan }} - {{ $item->nik }}
+                            {{ $item->nama_karyawan }}
                         </td>
                         <td>
                             {{ $item->jabatan_karyawan }} - {{ $item->nama_departemen }}
