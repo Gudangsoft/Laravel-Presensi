@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\HariLibur;
 use App\Models\Karyawan;
 use App\Models\Pengaturan;
@@ -131,10 +132,12 @@ class DashboardController extends Controller
             }
         }
 
+        $activityLogs = ActivityLog::latest()->limit(10)->get();
+
         return view("admin.dashboard", compact(
             "title", "totalKaryawan", "rekapPresensi", "rekapPengajuanPresensi",
             "totalTidakHadir", "karyawanHadir", "labels7Hari", "data7Hari", "rekapBulanIni",
-            "pengaturan", "holidayDates"
+            "pengaturan", "holidayDates", "activityLogs"
         ));
     }
 

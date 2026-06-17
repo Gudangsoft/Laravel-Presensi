@@ -185,8 +185,74 @@
             </div>
         </div>
 
-        {{-- ── Tabel Presensi Hari Ini ── --}}
-        <div class="rounded-2xl bg-white shadow-lg">
+        {{-- ── Log Aktivitas + Tabel Presensi ── --}}
+        <div class="grid grid-cols-1 gap-5 xl:grid-cols-3">
+
+        {{-- Log Aktivitas --}}
+        <div class="xl:col-span-1 rounded-2xl bg-white shadow-lg flex flex-col">
+            <div class="flex items-center justify-between border-b px-5 py-4">
+                <div>
+                    <h3 class="font-bold text-gray-800">Log Aktivitas</h3>
+                    <p class="text-xs text-gray-400">10 aktivitas terbaru</p>
+                </div>
+                <a href="{{ route('admin.activity-log') }}"
+                   class="flex items-center gap-1 rounded-xl border border-indigo-200 px-3 py-1.5 text-xs font-medium text-indigo-600 hover:bg-indigo-50 transition-colors">
+                    Lihat Semua <i class="ri-arrow-right-line"></i>
+                </a>
+            </div>
+            <div class="flex-1 overflow-y-auto px-4 py-3" style="max-height:480px">
+                @forelse ($activityLogs as $log)
+                    @php
+                        $action = strtolower($log->action ?? '');
+                        [$iconClass, $bgClass, $textClass] = match(true) {
+                            str_contains($action, 'login')          => ['ri-login-circle-line',  'bg-emerald-100', 'text-emerald-600'],
+                            str_contains($action, 'logout')         => ['ri-logout-circle-line', 'bg-gray-100',    'text-gray-500'],
+                            str_contains($action, 'delete')
+                            || str_contains($action, 'hapus')       => ['ri-delete-bin-line',    'bg-red-100',     'text-red-500'],
+                            str_contains($action, 'create')
+                            || str_contains($action, 'tambah')
+                            || str_contains($action, 'add')         => ['ri-add-circle-line',    'bg-blue-100',    'text-blue-600'],
+                            str_contains($action, 'update')
+                            || str_contains($action, 'edit')
+                            || str_contains($action, 'ubah')        => ['ri-edit-line',           'bg-amber-100',   'text-amber-600'],
+                            str_contains($action, 'reset')
+                            || str_contains($action, 'password')    => ['ri-lock-line',           'bg-violet-100',  'text-violet-600'],
+                            str_contains($action, 'export')
+                            || str_contains($action, 'download')    => ['ri-download-line',       'bg-teal-100',    'text-teal-600'],
+                            str_contains($action, 'approve')
+                            || str_contains($action, 'setuju')      => ['ri-check-double-line',   'bg-emerald-100', 'text-emerald-600'],
+                            str_contains($action, 'reject')
+                            || str_contains($action, 'tolak')       => ['ri-close-circle-line',   'bg-red-100',     'text-red-500'],
+                            default                                 => ['ri-information-line',    'bg-indigo-100',  'text-indigo-600'],
+                        };
+                    @endphp
+                    <div class="flex items-start gap-3 py-3 border-b border-gray-50 last:border-0">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-full {{ $bgClass }} flex items-center justify-center mt-0.5">
+                            <i class="{{ $iconClass }} text-sm {{ $textClass }}"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-semibold text-gray-800 truncate">{{ $log->user_name ?? 'System' }}</p>
+                            <p class="text-xs text-gray-500 leading-relaxed line-clamp-2 mt-0.5">{{ $log->description }}</p>
+                            <p class="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
+                                <i class="ri-time-line"></i>
+                                {{ $log->created_at?->diffForHumans() ?? '-' }}
+                                @if($log->ip_address)
+                                    <span class="ml-1 px-1.5 py-0.5 bg-gray-100 rounded text-gray-400 font-mono">{{ $log->ip_address }}</span>
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+                @empty
+                    <div class="flex flex-col items-center justify-center py-12 text-gray-400">
+                        <i class="ri-history-line text-3xl mb-2"></i>
+                        <p class="text-sm">Belum ada aktivitas tercatat</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+        {{-- Tabel Presensi Hari Ini --}}
+        <div class="xl:col-span-2 rounded-2xl bg-white shadow-lg">
             <div class="flex items-center justify-between border-b px-6 py-4">
                 <div>
                     <h3 class="font-bold text-gray-800">Presensi Hari Ini</h3>
@@ -255,6 +321,8 @@
                 </table>
             </div>
         </div>
+
+        </div>{{-- end grid log+presensi --}}
 
     </div>
 
