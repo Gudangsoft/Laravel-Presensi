@@ -66,11 +66,18 @@
                         {{ __('Administrasi') }}
                     </a>
 
+                    <a href="{{ route('admin.activity-log') }}"
+                       class="inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-150
+                              {{ request()->routeIs('admin.activity-log') ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">
+                        <i class="ri-history-line me-1.5 text-base"></i>
+                        {{ __('Log Aktivitas') }}
+                    </a>
+
                     {{-- Dropdown: Pengaturan & Tools --}}
                     <div class="relative" x-data="{ open: false }" @click.outside="open = false">
                         <button @click="open = !open"
                                 class="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-150
-                                       {{ request()->routeIs('admin.pengaturan','admin.hari-libur','admin.activity-log','admin.brand','admin.qr-presensi','admin.koreksi-presensi','admin.backup','admin.pengumuman','admin.absensi-massal') ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">
+                                       {{ request()->routeIs('admin.pengaturan','admin.hari-libur','admin.brand','admin.qr-presensi','admin.koreksi-presensi','admin.backup','admin.pengumuman','admin.absensi-massal') ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">
                             <i class="ri-settings-3-line text-base"></i>
                             <span>Pengaturan</span>
                             <i class="ri-arrow-down-s-line text-sm transition-transform" :class="{ 'rotate-180': open }"></i>
@@ -96,10 +103,6 @@
                             <a href="{{ route('admin.backup') }}"
                                class="flex items-center gap-2.5 px-4 py-2 text-sm {{ request()->routeIs('admin.backup') ? 'text-indigo-600 bg-indigo-50' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600' }} transition-colors">
                                 <i class="ri-database-2-line text-base text-gray-400"></i> Backup Database
-                            </a>
-                            <a href="{{ route('admin.activity-log') }}"
-                               class="flex items-center gap-2.5 px-4 py-2 text-sm {{ request()->routeIs('admin.activity-log') ? 'text-indigo-600 bg-indigo-50' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600' }} transition-colors">
-                                <i class="ri-history-line text-base text-gray-400"></i> Log Aktivitas
                             </a>
                             <div class="my-1 border-t border-gray-100"></div>
                             <a href="{{ route('admin.pengumuman') }}"
