@@ -57,12 +57,18 @@
                class="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold border transition-colors
                       {{ !request('kode_departemen') ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400 hover:text-indigo-600' }}">
                 <i class="ri-team-line"></i> Semua
+                <span class="ml-1 {{ !request('kode_departemen') ? 'bg-white/25 text-white' : 'bg-gray-100 text-gray-500' }} rounded-full px-1.5 py-0.5 text-[10px] font-bold">
+                    {{ $departemen->sum('karyawan_count') }}
+                </span>
             </a>
             @foreach ($departemen as $dept)
                 <a href="{{ route('admin.karyawan', array_merge(request()->except(['kode_departemen', 'page']), ['per_page' => request('per_page', 10), 'nama_karyawan' => request('nama_karyawan'), 'kode_departemen' => $dept->kode])) }}"
                    class="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold border transition-colors
                           {{ request('kode_departemen') === $dept->kode ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400 hover:text-indigo-600' }}">
                     {{ $dept->kode }} &mdash; {{ $dept->nama }}
+                    <span class="ml-1 {{ request('kode_departemen') === $dept->kode ? 'bg-white/25 text-white' : 'bg-gray-100 text-gray-500' }} rounded-full px-1.5 py-0.5 text-[10px] font-bold">
+                        {{ $dept->karyawan_count }}
+                    </span>
                 </a>
             @endforeach
         </div>

@@ -86,7 +86,7 @@ class KaryawanController extends Controller
     {
         $title = "Data Karyawan";
 
-        $departemen = Departemen::get();
+        $departemen = Departemen::withCount('karyawan')->get();
 
         $query = Karyawan::join('departemen as d', 'karyawan.departemen_id', '=', 'd.id')
             ->select('karyawan.*', 'd.kode')
