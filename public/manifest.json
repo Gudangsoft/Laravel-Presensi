@@ -1,0 +1,25 @@
+{
+    "name": "Presensi Karyawan",
+    "short_name": "Presensi",
+    "description": "Sistem Manajemen Presensi Karyawan",
+    "start_url": "/karyawan/dashboard",
+    "display": "standalone",
+    "background_color": "#f9fafb",
+    "theme_color": "#4f46e5",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "/img/favicon.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/img/favicon.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": ["productivity", "business"]
+}

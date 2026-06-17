@@ -48,13 +48,17 @@
                                 @endforeach
                             </select>
                         </div>
-                        <button
-                            type="submit"
-                            class="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-4 py-2.5 text-sm font-medium transition duration-150"
-                        >
-                            <i class="ri-file-pdf-line text-base"></i>
-                            Export PDF
-                        </button>
+                        <div class="flex gap-2">
+                            <button type="submit"
+                                class="flex-1 flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-4 py-2.5 text-sm font-medium transition">
+                                <i class="ri-file-pdf-line text-base"></i> PDF
+                            </button>
+                            <button type="submit"
+                                formaction="{{ route('admin.laporan.presensi.karyawan.excel') }}"
+                                class="flex-1 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl px-4 py-2.5 text-sm font-medium transition">
+                                <i class="ri-file-excel-line text-base"></i> Excel
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -84,13 +88,17 @@
                                 class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
                             />
                         </div>
-                        <button
-                            type="submit"
-                            class="w-full flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl px-4 py-2.5 text-sm font-medium transition duration-150"
-                        >
-                            <i class="ri-file-pdf-line text-base"></i>
-                            Export PDF
-                        </button>
+                        <div class="flex gap-2">
+                            <button type="submit"
+                                class="flex-1 flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl px-4 py-2.5 text-sm font-medium transition">
+                                <i class="ri-file-pdf-line text-base"></i> PDF
+                            </button>
+                            <button type="submit"
+                                formaction="{{ route('admin.laporan.presensi.semua-karyawan.excel') }}"
+                                class="flex-1 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl px-4 py-2.5 text-sm font-medium transition">
+                                <i class="ri-file-excel-line text-base"></i> Excel
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>

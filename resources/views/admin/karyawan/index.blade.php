@@ -95,6 +95,10 @@
                                                 class="inline-flex items-center justify-center rounded-lg border border-indigo-200 bg-indigo-50 p-1.5 text-indigo-600 hover:bg-indigo-100 hover:border-indigo-300 transition-colors" title="Edit">
                                             <i class="ri-pencil-line text-sm"></i>
                                         </button>
+                                        <button onclick="resetPassword('{{ $item->id }}', '{{ addslashes($item->nama_lengkap) }}')"
+                                                class="inline-flex items-center justify-center rounded-lg border border-amber-200 bg-amber-50 p-1.5 text-amber-600 hover:bg-amber-100 hover:border-amber-300 transition-colors" title="Reset Password">
+                                            <i class="ri-lock-password-line text-sm"></i>
+                                        </button>
                                         <button onclick="return delete_button('{{ $item->id }}', '{{ $item->nama_lengkap }}')"
                                                 class="inline-flex items-center justify-center rounded-lg border border-red-200 bg-red-50 p-1.5 text-red-500 hover:bg-red-100 hover:border-red-300 transition-colors" title="Hapus">
                                             <i class="ri-delete-bin-line text-sm"></i>
@@ -476,6 +480,49 @@
                     } else {
                         $(".foto-edit-preview").addClass('hidden');
                     }
+                }
+            });
+        }
+
+        function resetPassword(id, nama) {
+            Swal.fire({
+                title: 'Reset Password',
+                html: `<p class="text-sm text-gray-500 mb-4">Karyawan: <b>${nama}</b></p>
+                       <input id="swal-pwd" type="password" placeholder="Password baru (min. 8 karakter)"
+                              class="swal2-input" style="font-size:14px;">
+                       <input id="swal-pwd-confirm" type="password" placeholder="Konfirmasi password baru"
+                              class="swal2-input" style="font-size:14px;">`,
+                confirmButtonText: 'Reset Password',
+                confirmButtonColor: '#d97706',
+                cancelButtonText: 'Batal',
+                showCancelButton: true,
+                preConfirm: () => {
+                    const pwd = document.getElementById('swal-pwd').value;
+                    const confirm = document.getElementById('swal-pwd-confirm').value;
+                    if (!pwd || pwd.length < 8) {
+                        Swal.showValidationMessage('Password minimal 8 karakter');
+                        return false;
+                    }
+                    if (pwd !== confirm) {
+                        Swal.showValidationMessage('Konfirmasi password tidak cocok');
+                        return false;
+                    }
+                    return { pwd, confirm };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'POST',
+                        url: "{{ route('admin.karyawan.reset-password') }}",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            id: id,
+                            new_password: result.value.pwd,
+                            new_password_confirmation: result.value.confirm,
+                        },
+                        success: (r) => Swal.fire({ icon: 'success', title: 'Berhasil', text: r.message, confirmButtonColor: '#4f46e5' }),
+                        error: (r) => Swal.fire({ icon: 'error', title: 'Gagal', text: r.responseJSON?.message ?? 'Terjadi kesalahan.' }),
+                    });
                 }
             });
         }

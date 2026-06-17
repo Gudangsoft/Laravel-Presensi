@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 // Backup otomatis setiap hari pukul 02:00
 Schedule::command('backup:database')->dailyAt('02:00');
+
+// Auto-close absensi: set jam_keluar untuk yang belum presensi keluar (jam 23:55)
+Schedule::command('absensi:auto-close')->dailyAt('23:55')->timezone('Asia/Jakarta');

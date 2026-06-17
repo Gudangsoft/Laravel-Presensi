@@ -38,7 +38,7 @@ Route::group([
     'middleware' => ['guest', 'login-karyawan'],
 ], function () {
     Route::get('/', [AuthKaryawanController::class, 'create'])->name('login.view');
-    Route::post('/', [AuthKaryawanController::class, 'store'])->name('login.auth');
+    Route::post('/', [AuthKaryawanController::class, 'store'])->name('login.auth')->middleware('throttle:5,1');
 });
 
 Route::group([
@@ -99,6 +99,7 @@ Route::group([
     Route::get('/karyawan/perbarui', [KaryawanController::class, 'edit'])->name('admin.karyawan.edit');
     Route::post('/karyawan/perbarui', [KaryawanController::class, 'updateAdmin'])->name('admin.karyawan.update');
     Route::post('/karyawan/hapus', [KaryawanController::class, 'delete'])->name('admin.karyawan.delete');
+    Route::post('/karyawan/reset-password', [KaryawanController::class, 'resetPassword'])->name('admin.karyawan.reset-password');
     Route::get('/karyawan/export', [KaryawanController::class, 'export'])->name('admin.karyawan.export');
     Route::get('/karyawan/template', [KaryawanController::class, 'template'])->name('admin.karyawan.template');
     Route::post('/karyawan/import', [KaryawanController::class, 'import'])->name('admin.karyawan.import');
@@ -115,6 +116,8 @@ Route::group([
     Route::get('/laporan/presensi', [PresensiController::class, 'laporan'])->name('admin.laporan.presensi');
     Route::post('/laporan/presensi/karyawan', [PresensiController::class, 'laporanPresensiKaryawan'])->name('admin.laporan.presensi.karyawan');
     Route::post('/laporan/presensi/semua-karyawan', [PresensiController::class, 'laporanPresensiSemuaKaryawan'])->name('admin.laporan.presensi.semua-karyawan');
+    Route::post('/laporan/presensi/karyawan/excel', [PresensiController::class, 'laporanPresensiKaryawanExcel'])->name('admin.laporan.presensi.karyawan.excel');
+    Route::post('/laporan/presensi/semua-karyawan/excel', [PresensiController::class, 'laporanPresensiSemuaKaryawanExcel'])->name('admin.laporan.presensi.semua-karyawan.excel');
 
     Route::get('/lokasi', [LokasiKantorController::class, 'index'])->name('admin.lokasi-kantor');
     Route::post('/lokasi/tambah', [LokasiKantorController::class, 'store'])->name('admin.lokasi-kantor.store');

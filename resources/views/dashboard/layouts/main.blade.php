@@ -7,8 +7,14 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>{{ $title }} &mdash; {{ $brand?->nama_aplikasi ?? 'Presensi' }}</title>
 
-        <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('img/apple-icon.png') }}" />
+        <link rel="apple-touch-icon" sizes="76x76" href="{{ $brand?->faviconUrl() ?? asset('img/apple-icon.png') }}" />
         <link rel="icon" type="image/png" href="{{ $brand?->faviconUrl() ?? asset('img/favicon.png') }}" />
+        <link rel="manifest" href="/manifest.json">
+        <meta name="theme-color" content="#4f46e5">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="default">
+        <meta name="apple-mobile-web-app-title" content="{{ $brand?->nama_aplikasi ?? config('app.name') }}">
 
         @include("dashboard.layouts.link")
         @yield("css")

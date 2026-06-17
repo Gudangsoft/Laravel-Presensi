@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Enums\StatusPengajuanPresensi;
+use App\Exports\PresensiKaryawanExport;
+use App\Exports\PresensiSemuaKaryawanExport;
 use App\Models\ActivityLog;
 use App\Models\Departemen;
 use App\Models\Karyawan;
@@ -15,6 +17,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PresensiController extends Controller
 {
@@ -104,9 +107,18 @@ class PresensiController extends Controller
             ]);
         }
 
-        $image      = $request->image;
-        $imageParts = explode(";base64", $image);
+        $image = $request->image;
+        if (!$image || !str_starts_with($image, 'data:image/')) {
+            return response()->json(['status' => 422, 'success' => false, 'message' => 'Format foto tidak valid.']);
+        }
+        if (!preg_match('/^data:image\/(jpeg|jpg|png|webp);base64,/', $image)) {
+            return response()->json(['status' => 422, 'success' => false, 'message' => 'Foto harus berformat JPEG, PNG, atau WebP.']);
+        }
+        $imageParts  = explode(";base64,", $image);
         $imageBase64 = base64_decode($imageParts[1]);
+        if (strlen($imageBase64) > 3 * 1024 * 1024) {
+            return response()->json(['status' => 422, 'success' => false, 'message' => 'Ukuran foto maksimal 3MB.']);
+        }
 
         $fileName = $folderName . ".png";
         $file     = $folderPath . $fileName;
@@ -358,6 +370,15 @@ class PresensiController extends Controller
         return $pdf->stream($title . ' ' . $karyawan->nama_lengkap . '.pdf');
     }
 
+    public function laporanPresensiKaryawanExcel(Request $request)
+    {
+        $karyawan   = Karyawan::findOrFail($request->karyawan);
+        $pengaturan = Pengaturan::first();
+        $bulan      = $request->bulan;
+        $fileName   = 'presensi-' . str_replace(' ', '-', strtolower($karyawan->nama_lengkap)) . '-' . Carbon::make($bulan)->format('Y-m') . '.xlsx';
+        return Excel::download(new PresensiKaryawanExport($karyawan->id, $bulan, $pengaturan->jam_masuk), $fileName);
+    }
+
     public function laporanPresensiSemuaKaryawan(Request $request)
     {
         $title           = 'Laporan Presensi Semua Karyawan';
@@ -386,6 +407,13 @@ class PresensiController extends Controller
 
         $pdf = Pdf::loadView('admin.laporan.pdf.presensi-semua-karyawan', compact('title', 'bulan', 'riwayatPresensi'));
         return $pdf->stream($title . '.pdf');
+    }
+
+    public function laporanPresensiSemuaKaryawanExcel(Request $request)
+    {
+        $bulan    = $request->bulan;
+        $fileName = 'presensi-semua-karyawan-' . Carbon::make($bulan)->format('Y-m') . '.xlsx';
+        return Excel::download(new PresensiSemuaKaryawanExport($bulan), $fileName);
     }
 
     public function indexAdmin(Request $request)

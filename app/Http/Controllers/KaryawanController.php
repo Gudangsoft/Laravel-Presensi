@@ -177,6 +177,24 @@ class KaryawanController extends Controller
         }
     }
 
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'id'           => 'required|exists:karyawan,id',
+            'new_password' => 'required|string|min:8|confirmed',
+        ], [
+            'new_password.min'       => 'Password minimal 8 karakter.',
+            'new_password.confirmed' => 'Konfirmasi password tidak cocok.',
+        ]);
+
+        $karyawan = Karyawan::findOrFail($request->id);
+        $karyawan->update(['password' => Hash::make($request->new_password)]);
+
+        ActivityLog::record('reset_password_karyawan', 'Reset password karyawan: ' . $karyawan->nama_lengkap);
+
+        return response()->json(['success' => true, 'message' => 'Password karyawan berhasil direset.']);
+    }
+
     public function delete(Request $request)
     {
         $data   = Karyawan::where('id', $request->id)->first();
