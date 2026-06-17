@@ -88,6 +88,12 @@
                 <span>Laporan</span>
             </a>
 
+            <a href="{{ route('admin.activity-log') }}"
+               class="sidebar-link {{ request()->routeIs('admin.activity-log') ? 'active' : '' }}">
+                <i class="ri-history-line text-lg"></i>
+                <span>Log Aktivitas</span>
+            </a>
+
             <p class="mb-2 mt-5 px-3 text-[10px] font-semibold uppercase tracking-widest text-indigo-500">Konfigurasi</p>
 
             <a href="{{ route('admin.lokasi-kantor') }}"
