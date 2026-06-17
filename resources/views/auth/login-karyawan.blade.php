@@ -147,6 +147,17 @@
                             <i class="ri-login-circle-line mr-2"></i>
                             Masuk
                         </button>
+
+                        {{-- Forgot Password --}}
+                        <div class="text-center mt-4">
+                            <a
+                                href="{{ route('karyawan.forgot-password') }}"
+                                class="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-indigo-600 font-medium transition-colors duration-200"
+                            >
+                                <i class="ri-question-line"></i>
+                                Lupa kata sandi?
+                            </a>
+                        </div>
                     </form>
 
                     {{-- Footer --}}

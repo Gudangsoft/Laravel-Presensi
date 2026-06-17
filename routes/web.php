@@ -35,10 +35,12 @@ Route::middleware('auth')->group(function () {
 
 Route::group([
     'prefix' => 'login-karyawan',
-    'middleware' => ['guest', 'login-karyawan'],
+    'middleware' => ['login-karyawan'],
 ], function () {
     Route::get('/', [AuthKaryawanController::class, 'create'])->name('login.view');
     Route::post('/', [AuthKaryawanController::class, 'store'])->name('login.auth')->middleware('throttle:5,1');
+    Route::get('/lupa-sandi', [AuthKaryawanController::class, 'forgotPassword'])->name('karyawan.forgot-password');
+    Route::post('/lupa-sandi', [AuthKaryawanController::class, 'sendResetNotification'])->name('karyawan.forgot-password.send')->middleware('throttle:3,1');
 });
 
 Route::group([
