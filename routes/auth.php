@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/auth/google/admin',    [GoogleAuthController::class, 'redirectAdmin'])->name('google.admin.redirect');
 Route::get('/auth/google/karyawan', [GoogleAuthController::class, 'redirectKaryawan'])->name('google.karyawan.redirect');
 // Satu callback URL untuk Google Console (baca state=admin|karyawan)
-Route::get('/google/callback', [GoogleAuthController::class, 'handleCallback'])->name('google.callback');
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleCallback'])->name('google.callback');
 
 Route::middleware(['guest', 'login-karyawan'])->group(function () {
     // Route::get('register', [RegisteredUserController::class, 'create'])
