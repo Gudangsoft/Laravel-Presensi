@@ -370,6 +370,84 @@ class PresensiController extends Controller
         return $pdf->stream($title . ' ' . $karyawan->nama_lengkap . '.pdf');
     }
 
+    public function laporanPresensiKaryawanView(Request $request)
+    {
+        $bulan    = $request->bulan;
+        $karyawan = Karyawan::with('departemen')->where('id', $request->karyawan)->first();
+
+        if (!$karyawan || !$bulan) {
+            return response()->json(['error' => 'Parameter tidak lengkap.'], 422);
+        }
+
+        $pengaturan      = Pengaturan::first();
+        $riwayatPresensi = DB::table("presensi")
+            ->where('karyawan_id', $karyawan->id)
+            ->whereMonth('tanggal_presensi', Carbon::make($bulan)->format('m'))
+            ->whereYear('tanggal_presensi', Carbon::make($bulan)->format('Y'))
+            ->orderBy("tanggal_presensi", "asc")
+            ->get()
+            ->map(function ($p) use ($pengaturan) {
+                $durasi = null;
+                if ($p->jam_masuk && $p->jam_keluar) {
+                    $masuk  = Carbon::parse($p->jam_masuk);
+                    $keluar = Carbon::parse($p->jam_keluar);
+                    $menit  = $masuk->diffInMinutes($keluar);
+                    $durasi = floor($menit / 60) . 'j ' . ($menit % 60) . 'm';
+                }
+                return [
+                    'tanggal'   => Carbon::parse($p->tanggal_presensi)->isoFormat('D MMM YYYY'),
+                    'hari'      => Carbon::parse($p->tanggal_presensi)->isoFormat('dddd'),
+                    'jam_masuk' => $p->jam_masuk ?? '-',
+                    'jam_keluar'=> $p->jam_keluar ?? '-',
+                    'durasi'    => $durasi ?? '-',
+                    'status'    => ($p->jam_masuk && $p->jam_masuk > $pengaturan->jam_masuk) ? 'Terlambat' : 'Tepat Waktu',
+                ];
+            });
+
+        return response()->json([
+            'karyawan' => [
+                'nama'      => $karyawan->nama_lengkap,
+                'jabatan'   => $karyawan->jabatan,
+                'departemen'=> $karyawan->departemen?->nama ?? '-',
+                'email'     => $karyawan->email,
+            ],
+            'bulan'  => Carbon::make($bulan)->isoFormat('MMMM YYYY'),
+            'total'  => $riwayatPresensi->count(),
+            'data'   => $riwayatPresensi->values(),
+        ]);
+    }
+
+    public function laporanPresensiSemuaKaryawanView(Request $request)
+    {
+        $bulan      = $request->bulan;
+        $pengaturan = Pengaturan::first();
+
+        if (!$bulan) {
+            return response()->json(['error' => 'Parameter tidak lengkap.'], 422);
+        }
+
+        $riwayatPresensi = DB::table("presensi")
+            ->join('karyawan', 'presensi.karyawan_id', '=', 'karyawan.id')
+            ->join('departemen as d', 'karyawan.departemen_id', '=', 'd.id')
+            ->whereMonth('tanggal_presensi', Carbon::make($bulan)->format('m'))
+            ->whereYear('tanggal_presensi', Carbon::make($bulan)->format('Y'))
+            ->select(
+                'karyawan.nama_lengkap as nama',
+                'karyawan.jabatan',
+                'd.nama as departemen'
+            )
+            ->selectRaw("COUNT(presensi.karyawan_id) as total_hadir, SUM(IF(jam_masuk > ?,1,0)) as total_terlambat", [$pengaturan->jam_masuk])
+            ->groupBy('presensi.karyawan_id', 'karyawan.nama_lengkap', 'karyawan.jabatan', 'd.nama')
+            ->orderBy('karyawan.nama_lengkap')
+            ->get();
+
+        return response()->json([
+            'bulan' => Carbon::make($bulan)->isoFormat('MMMM YYYY'),
+            'total' => $riwayatPresensi->count(),
+            'data'  => $riwayatPresensi->values(),
+        ]);
+    }
+
     public function laporanPresensiKaryawanExcel(Request $request)
     {
         $karyawan   = Karyawan::findOrFail($request->karyawan);

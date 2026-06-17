@@ -116,6 +116,8 @@ Route::group([
     Route::post('/monitoring-presensi', [PresensiController::class, 'viewLokasi'])->name('admin.monitoring-presensi.lokasi');
 
     Route::get('/laporan/presensi', [PresensiController::class, 'laporan'])->name('admin.laporan.presensi');
+    Route::get('/laporan/presensi/karyawan/view', [PresensiController::class, 'laporanPresensiKaryawanView'])->name('admin.laporan.presensi.karyawan.view');
+    Route::get('/laporan/presensi/semua-karyawan/view', [PresensiController::class, 'laporanPresensiSemuaKaryawanView'])->name('admin.laporan.presensi.semua-karyawan.view');
     Route::post('/laporan/presensi/karyawan', [PresensiController::class, 'laporanPresensiKaryawan'])->name('admin.laporan.presensi.karyawan');
     Route::post('/laporan/presensi/semua-karyawan', [PresensiController::class, 'laporanPresensiSemuaKaryawan'])->name('admin.laporan.presensi.semua-karyawan');
     Route::post('/laporan/presensi/karyawan/excel', [PresensiController::class, 'laporanPresensiKaryawanExcel'])->name('admin.laporan.presensi.karyawan.excel');
