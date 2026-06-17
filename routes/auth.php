@@ -4,12 +4,19 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
+
+// ── Google OAuth ───────────────────────────────────────────────────────
+Route::get('/auth/google/admin',          [GoogleAuthController::class, 'redirectAdmin'])->name('google.admin.redirect');
+Route::get('/auth/google/admin/callback', [GoogleAuthController::class, 'callbackAdmin'])->name('google.admin.callback');
+Route::get('/auth/google/karyawan',          [GoogleAuthController::class, 'redirectKaryawan'])->name('google.karyawan.redirect');
+Route::get('/auth/google/karyawan/callback', [GoogleAuthController::class, 'callbackKaryawan'])->name('google.karyawan.callback');
 
 Route::middleware(['guest', 'login-karyawan'])->group(function () {
     // Route::get('register', [RegisteredUserController::class, 'create'])
