@@ -34,14 +34,7 @@
                                value="{{ request()->nama_karyawan }}"
                                class="w-full rounded-xl border border-gray-300 py-2 pl-9 pr-4 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                     </div>
-                    <select name="kode_departemen"
-                            class="rounded-xl border border-gray-300 py-2 pl-3 pr-8 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <option value="">Semua Departemen</option>
-                        @foreach ($departemen as $item)
-                            <option value="{{ $item->kode }}" @if ($item->kode == request()->kode_departemen) selected @endif>{{ $item->nama }}</option>
-                        @endforeach
-                    </select>
-                    <select name="per_page" onchange="this.form.submit()"
+<select name="per_page" onchange="this.form.submit()"
                             class="rounded-xl border border-gray-300 py-2 pl-3 pr-8 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         @foreach ([10, 25, 50, 100] as $n)
                             <option value="{{ $n }}" @selected(request()->input('per_page', 10) == $n)>{{ $n }} data</option>
@@ -57,6 +50,23 @@
     </x-slot>
 
     <div class="container mx-auto px-5 pt-5 pb-10">
+
+        {{-- Filter Tabs Departemen --}}
+        <div class="flex items-center gap-2 flex-wrap mb-4">
+            <a href="{{ route('admin.karyawan', array_merge(request()->except(['kode_departemen', 'page']), ['per_page' => request('per_page', 10), 'nama_karyawan' => request('nama_karyawan')])) }}"
+               class="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold border transition-colors
+                      {{ !request('kode_departemen') ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400 hover:text-indigo-600' }}">
+                <i class="ri-team-line"></i> Semua
+            </a>
+            @foreach ($departemen as $dept)
+                <a href="{{ route('admin.karyawan', array_merge(request()->except(['kode_departemen', 'page']), ['per_page' => request('per_page', 10), 'nama_karyawan' => request('nama_karyawan'), 'kode_departemen' => $dept->kode])) }}"
+                   class="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold border transition-colors
+                          {{ request('kode_departemen') === $dept->kode ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400 hover:text-indigo-600' }}">
+                    {{ $dept->kode }} &mdash; {{ $dept->nama }}
+                </a>
+            @endforeach
+        </div>
+
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full border-collapse">
