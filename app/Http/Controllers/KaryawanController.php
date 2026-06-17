@@ -100,7 +100,8 @@ class KaryawanController extends Controller
             $query->where('d.kode', 'like', '%' . $request->kode_departemen . '%');
         }
 
-        $karyawan = $query->paginate(10);
+        $perPage = in_array((int) $request->input('per_page', 10), [10, 25, 50, 100]) ? (int) $request->input('per_page', 10) : 10;
+        $karyawan = $query->paginate($perPage)->withQueryString();
 
         return view('admin.karyawan.index', compact('title', 'karyawan', 'departemen'));
     }

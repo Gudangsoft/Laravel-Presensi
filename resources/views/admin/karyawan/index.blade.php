@@ -25,8 +25,8 @@
                 </div>
             </div>
             <div class="flex flex-1 items-center gap-3">
-                <form action="{{ route('admin.karyawan') }}" method="get" class="flex flex-1 items-center gap-2 sm:max-w-xl">
-                    <div class="relative flex-1">
+                <form action="{{ route('admin.karyawan') }}" method="get" class="flex flex-1 items-center gap-2 flex-wrap">
+                    <div class="relative flex-1 min-w-[180px]">
                         <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400">
                             <i class="ri-search-line text-base"></i>
                         </span>
@@ -39,6 +39,12 @@
                         <option value="">Semua Departemen</option>
                         @foreach ($departemen as $item)
                             <option value="{{ $item->kode }}" @if ($item->kode == request()->kode_departemen) selected @endif>{{ $item->nama }}</option>
+                        @endforeach
+                    </select>
+                    <select name="per_page" onchange="this.form.submit()"
+                            class="rounded-xl border border-gray-300 py-2 pl-3 pr-8 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        @foreach ([10, 25, 50, 100] as $n)
+                            <option value="{{ $n }}" @selected(request()->input('per_page', 10) == $n)>{{ $n }} data</option>
                         @endforeach
                     </select>
                     <button type="submit" class="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors">
@@ -119,11 +125,15 @@
                     </tbody>
                 </table>
             </div>
-            @if ($karyawan->hasPages())
-                <div class="border-t border-gray-100 px-4 py-3">
+            <div class="border-t border-gray-100 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-2">
+                <p class="text-xs text-gray-400">
+                    Menampilkan {{ $karyawan->firstItem() ?? 0 }}–{{ $karyawan->lastItem() ?? 0 }}
+                    dari <span class="font-semibold text-gray-600">{{ $karyawan->total() }}</span> karyawan
+                </p>
+                @if ($karyawan->hasPages())
                     {{ $karyawan->links() }}
-                </div>
-            @endif
+                @endif
+            </div>
         </div>
     </div>
 
