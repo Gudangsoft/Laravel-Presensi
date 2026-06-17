@@ -10,33 +10,62 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\SkipsOnError;
 use Maatwebsite\Excel\Concerns\SkipsErrors;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Maatwebsite\Excel\Concerns\SkipsFailures;
 
-class KaryawanImport implements ToModel, WithHeadingRow, SkipsOnError
+class KaryawanImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnError, SkipsOnFailure
 {
-    use SkipsErrors;
+    use SkipsErrors, SkipsFailures;
 
     public function model(array $row): ?Karyawan
     {
-        if (empty($row['nama_lengkap']) || empty($row['email'])) {
-            return null;
-        }
-
-        // Skip if email already exists
-        if (Karyawan::where('email', $row['email'])->exists()) {
-            return null;
-        }
-
         $departemen = Departemen::where('kode', strtoupper(trim($row['kode_departemen'] ?? '')))
-            ->orWhere('nama', $row['kode_departemen'] ?? '')
+            ->orWhere('nama', trim($row['kode_departemen'] ?? ''))
             ->first();
 
+        // Fallback ke departemen pertama yang ada jika tidak ditemukan
+        if (!$departemen) {
+            $departemen = Departemen::first();
+        }
+
+        if (!$departemen) {
+            return null;
+        }
+
         return new Karyawan([
-            'departemen_id' => $departemen?->id ?? 1,
-            'nama_lengkap'  => $row['nama_lengkap'],
-            'jabatan'       => $row['jabatan'] ?? 'Karyawan',
-            'telepon'       => $row['telepon'] ?? '-',
-            'email'         => $row['email'],
+            'departemen_id' => $departemen->id,
+            'nama_lengkap'  => trim($row['nama_lengkap']),
+            'jabatan'       => trim($row['jabatan'] ?? 'Karyawan'),
+            'telepon'       => trim($row['telepon'] ?? '-'),
+            'email'         => strtolower(trim($row['email'])),
             'password'      => Hash::make($row['password'] ?? 'password'),
         ]);
+    }
+
+    public function rules(): array
+    {
+        return [
+            'nama_lengkap' => 'required|string|max:255',
+            'email'        => 'required|email|unique:karyawan,email',
+        ];
+    }
+
+    public function customValidationMessages(): array
+    {
+        return [
+            'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
+            'nama_lengkap.max'      => 'Nama lengkap maksimal 255 karakter.',
+            'email.required'        => 'Email wajib diisi.',
+            'email.email'           => 'Format email tidak valid.',
+            'email.unique'          => 'Email sudah terdaftar di sistem.',
+        ];
+    }
+
+    public function customValidationAttributes(): array
+    {
+        return [
+            'nama_lengkap' => 'Nama Lengkap',
+            'email'        => 'Email',
+        ];
     }
 }

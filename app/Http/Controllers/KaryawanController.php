@@ -236,9 +236,21 @@ class KaryawanController extends Controller
         $import = new KaryawanImport();
         Excel::import($import, $request->file('file'));
 
-        $errors = $import->errors();
-        if ($errors->isNotEmpty()) {
-            return to_route('admin.karyawan')->with('error', 'Import selesai dengan ' . $errors->count() . ' error.');
+        $failures   = $import->failures();
+        $exceptions = $import->errors();
+        $totalGagal = $failures->count() + count($exceptions);
+
+        if ($totalGagal > 0) {
+            $errorMessages = [];
+            foreach ($failures as $failure) {
+                $errorMessages[] = 'Baris ' . $failure->row() . ': ' . implode(', ', $failure->errors());
+            }
+            foreach ($exceptions as $e) {
+                $errorMessages[] = $e->getMessage();
+            }
+            return to_route('admin.karyawan')
+                ->with('import_errors', $errorMessages)
+                ->with('error', 'Import selesai dengan ' . $totalGagal . ' baris gagal.');
         }
 
         return to_route('admin.karyawan')->with('success', 'Data karyawan berhasil diimport.');

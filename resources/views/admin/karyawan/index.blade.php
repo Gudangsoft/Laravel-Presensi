@@ -447,7 +447,20 @@
         @if (session()->has('success'))
             Swal.fire({ title: 'Berhasil', text: '{{ session('success') }}', icon: 'success', confirmButtonColor: '#4f46e5', confirmButtonText: 'OK' });
         @endif
-        @if (session()->has('error'))
+        @if (session()->has('error') && session()->has('import_errors'))
+            const importErrors = @json(session('import_errors'));
+            const errHtml = '<div style="text-align:left;max-height:260px;overflow-y:auto;padding:4px 0">' +
+                importErrors.map(e => `<div style="display:flex;gap:8px;margin-bottom:6px;font-size:13px;color:#374151"><span style="color:#ef4444;flex-shrink:0">●</span><span>${e}</span></div>`).join('') +
+                '</div>';
+            Swal.fire({
+                title: 'Detail Error Import',
+                html: errHtml,
+                icon: 'warning',
+                confirmButtonColor: '#4f46e5',
+                confirmButtonText: 'Tutup',
+                footer: '<span style="font-size:12px;color:#6b7280">{{ session('error') }}</span>',
+            });
+        @elseif (session()->has('error'))
             Swal.fire({ title: 'Gagal', text: '{{ session('error') }}', icon: 'error', confirmButtonColor: '#4f46e5', confirmButtonText: 'OK' });
         @endif
 
