@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginKaryawanRequest;
+use App\Services\CaptchaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,12 +12,10 @@ use Illuminate\View\View;
 
 class AuthKaryawanController extends Controller
 {
-    /**
-     * Display the login view.
-     */
     public function create(): View
     {
-        return view('auth.login-karyawan');
+        $captchaQuestion = CaptchaService::generate();
+        return view('auth.login-karyawan', compact('captchaQuestion'));
     }
 
     /**

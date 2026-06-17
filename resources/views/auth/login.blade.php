@@ -173,7 +173,7 @@
                     </div>
 
                     {{-- Remember Me --}}
-                    <div class="mb-6">
+                    <div class="mb-5">
                         <label for="remember_me" class="inline-flex items-center cursor-pointer select-none">
                             <input
                                 id="remember_me"
@@ -183,6 +183,35 @@
                             >
                             <span class="ms-2 text-sm text-gray-600">Ingat saya</span>
                         </label>
+                    </div>
+
+                    {{-- CAPTCHA --}}
+                    <div class="mb-6">
+                        <label for="captcha_answer" class="block text-sm font-semibold text-gray-700 mb-1.5">
+                            Verifikasi Keamanan
+                        </label>
+                        <div class="flex items-center gap-3 mb-2 bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-2.5">
+                            <i class="ri-shield-check-line text-indigo-500 text-lg flex-shrink-0"></i>
+                            <span class="text-sm text-gray-600">Berapa hasil dari</span>
+                            <span class="text-base font-bold text-indigo-700 tracking-wide">{{ $captchaQuestion }}</span>
+                            <span class="text-sm text-gray-600">= ?</span>
+                        </div>
+                        <input
+                            id="captcha_answer"
+                            type="number"
+                            name="captcha_answer"
+                            min="0"
+                            max="99"
+                            placeholder="Masukkan jawaban"
+                            autocomplete="off"
+                            class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200 @error('captcha_answer') border-red-400 focus:ring-red-400 focus:border-red-400 @enderror"
+                        >
+                        @error('captcha_answer')
+                            <p class="mt-1.5 text-xs text-red-500 flex items-center gap-1">
+                                <i class="ri-error-warning-line"></i>
+                                {{ $message }}
+                            </p>
+                        @enderror
                     </div>
 
                     {{-- Submit Button --}}

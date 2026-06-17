@@ -27,8 +27,24 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string'],
+            'email'          => ['required', 'string', 'email'],
+            'password'       => ['required', 'string'],
+            'captcha_answer' => [
+                'required', 'integer',
+                function ($attribute, $value, $fail) {
+                    if ((int) session('captcha_answer') !== (int) $value) {
+                        $fail('Jawaban captcha salah. Silakan coba lagi.');
+                    }
+                },
+            ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'captcha_answer.required' => 'Jawaban captcha wajib diisi.',
+            'captcha_answer.integer'  => 'Jawaban captcha harus berupa angka.',
         ];
     }
 
