@@ -13,39 +13,48 @@ use Throwable;
 
 class GoogleAuthController extends Controller
 {
+    private function callbackUrl(): string
+    {
+        return url('/auth/google/callback');
+    }
+
     public function redirectAdmin(): RedirectResponse
     {
+        session(['google_login_type' => 'admin']);
+
         return Socialite::driver('google')
-            ->with(['state' => 'admin'])
+            ->stateless()
+            ->redirectUrl($this->callbackUrl())
             ->redirect();
     }
 
     public function redirectKaryawan(): RedirectResponse
     {
+        session(['google_login_type' => 'karyawan']);
+
         return Socialite::driver('google')
-            ->with(['state' => 'karyawan'])
+            ->stateless()
+            ->redirectUrl($this->callbackUrl())
             ->redirect();
     }
 
-    /**
-     * Satu callback URL untuk kedua guard.
-     * Google Console hanya perlu mendaftarkan: /google/callback
-     * State param (admin|karyawan) menentukan guard mana yang dipakai.
-     */
     public function handleCallback(): RedirectResponse
     {
-        $state = request('state', 'karyawan');
+        $type = session('google_login_type', 'karyawan');
 
         try {
-            $googleUser = Socialite::driver('google')->user();
+            $googleUser = Socialite::driver('google')
+                ->stateless()
+                ->redirectUrl($this->callbackUrl())
+                ->user();
         } catch (Throwable) {
-            $redirect = $state === 'admin' ? '/login' : '/login-karyawan';
+            $redirect = $type === 'admin' ? '/login' : '/login-karyawan';
             return redirect($redirect)->withErrors([
                 'email' => 'Login Google dibatalkan atau gagal. Coba lagi.',
             ]);
         }
 
-        if ($state === 'admin') {
+        if ($type === 'admin') {
             return $this->loginAdmin($googleUser->getEmail());
         }
 
