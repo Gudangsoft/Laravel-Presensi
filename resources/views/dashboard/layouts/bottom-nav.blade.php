@@ -49,6 +49,19 @@
                 <span class="text-[10px] {{ $a4 ? 'font-bold text-indigo-600' : 'font-semibold' }} leading-none">Izin</span>
             </a>
 
+            {{-- Smart Learning --}}
+            @php $a6 = Request::routeIs('karyawan.learning'); @endphp
+            <a href="{{ route('karyawan.learning') }}"
+               class="flex flex-1 flex-col items-center justify-center gap-0.5 h-full transition-all duration-200 {{ $a6 ? 'text-indigo-600' : 'text-gray-400' }}">
+                <span class="relative flex h-8 w-8 items-center justify-center rounded-xl {{ $a6 ? 'bg-indigo-50' : '' }}">
+                    <i class="{{ $a6 ? 'ri-translate-2' : 'ri-translate-2' }} text-xl"></i>
+                    @if(!$a6)
+                        <span class="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-emerald-500"></span>
+                    @endif
+                </span>
+                <span class="text-[10px] {{ $a6 ? 'font-bold text-indigo-600' : 'font-semibold' }} leading-none">English</span>
+            </a>
+
             {{-- Profil --}}
             @php $a5 = Request::routeIs('karyawan.profile'); @endphp
             <a href="{{ route('karyawan.profile') }}"
