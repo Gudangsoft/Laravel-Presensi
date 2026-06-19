@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AbsensiMassalController;
+use App\Http\Controllers\LearningController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AuthKaryawanController;
 use App\Http\Controllers\BackupController;
@@ -85,6 +86,11 @@ Route::group([
     });
 
     Route::get('/presensi/rekap-pdf', [PresensiController::class, 'rekapPdf'])->name('karyawan.presensi.rekap-pdf');
+
+    // Smart Learning English
+    Route::get('/learning', [LearningController::class, 'index'])->name('karyawan.learning');
+    Route::get('/learning/words', [LearningController::class, 'words'])->name('karyawan.learning.words');
+    Route::post('/learning/score', [LearningController::class, 'saveScore'])->name('karyawan.learning.score');
 
     // QR scan (karyawan must be logged in)
     Route::get('/scan/{token}', [QrSessionController::class, 'scan'])->name('karyawan.scan');

@@ -79,6 +79,19 @@
                 </a>
             </li>
 
+            {{-- Smart Learning English --}}
+            <li>
+                <a href="{{ route('karyawan.learning') }}"
+                   class="relative flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-150
+                          {{ Request::routeIs('karyawan.learning')
+                              ? 'bg-white/10 text-white before:absolute before:left-0 before:top-1/2 before:h-5 before:w-1 before:-translate-y-1/2 before:rounded-r-full before:bg-indigo-400'
+                              : 'text-white/60 hover:bg-white/5 hover:text-white' }}">
+                    <i class="ri-translate-2 text-lg"></i>
+                    <span>Smart Learning</span>
+                    <span class="ml-auto rounded-full bg-emerald-500 px-1.5 py-0.5 text-[9px] font-bold text-white">NEW</span>
+                </a>
+            </li>
+
             {{-- Profile --}}
             <li>
                 <a href="{{ route('karyawan.profile') }}"
