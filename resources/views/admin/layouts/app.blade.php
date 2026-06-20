@@ -94,6 +94,18 @@
                 <span>Log Aktivitas</span>
             </a>
 
+            <a href="{{ route('admin.monitoring.keterlambatan') }}"
+               class="sidebar-link {{ request()->routeIs('admin.monitoring.keterlambatan') ? 'active' : '' }}">
+                <i class="ri-alarm-warning-line text-lg"></i>
+                <span>Keterlambatan</span>
+            </a>
+
+            <a href="{{ route('admin.lembur') }}"
+               class="sidebar-link {{ request()->routeIs('admin.lembur') ? 'active' : '' }}">
+                <i class="ri-time-line text-lg"></i>
+                <span>Lembur</span>
+            </a>
+
             <p class="mb-2 mt-5 px-3 text-[10px] font-semibold uppercase tracking-widest text-indigo-500">Konfigurasi</p>
 
             <a href="{{ route('admin.lokasi-kantor') }}"

@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AbsensiMassalController;
 use App\Http\Controllers\LearningController;
+use App\Http\Controllers\LemburController;
+use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AuthKaryawanController;
 use App\Http\Controllers\BackupController;
@@ -91,6 +93,40 @@ Route::group([
     Route::get('/learning', [LearningController::class, 'index'])->name('karyawan.learning');
     Route::get('/learning/words', [LearningController::class, 'words'])->name('karyawan.learning.words');
     Route::post('/learning/score', [LearningController::class, 'saveScore'])->name('karyawan.learning.score');
+
+    // Lembur
+    Route::get('/lembur', [LemburController::class, 'index'])->name('karyawan.lembur');
+    Route::post('/lembur', [LemburController::class, 'store'])->name('karyawan.lembur.store');
+
+    // Direktori Karyawan
+    Route::get('/direktori', function (\Illuminate\Http\Request $req) {
+        $q = $req->input('q');
+        $karyawan = \App\Models\Karyawan::with('departemen')
+            ->when($q, fn($query) => $query->where('nama_lengkap', 'like', "%{$q}%")
+                ->orWhereHas('departemen', fn($d) => $d->where('nama', 'like', "%{$q}%")))
+            ->orderBy('nama_lengkap')->paginate(20);
+        return view('dashboard.direktori.index', ['title' => 'Direktori Karyawan', 'karyawan' => $karyawan]);
+    })->name('karyawan.direktori');
+
+    // Kalender Kehadiran
+    Route::get('/kalender', function () {
+        $user  = \Illuminate\Support\Facades\Auth::guard('karyawan')->user();
+        $bulan = request('bulan', now()->month);
+        $tahun = request('tahun', now()->year);
+        $presensi = \Illuminate\Support\Facades\DB::table('presensi')
+            ->where('karyawan_id', $user->id)
+            ->whereMonth('tanggal_presensi', $bulan)
+            ->whereYear('tanggal_presensi', $tahun)
+            ->pluck('jam_masuk', 'tanggal_presensi');
+        $izin = \Illuminate\Support\Facades\DB::table('pengajuan_presensi')
+            ->where('karyawan_id', $user->id)
+            ->where('status_approved', 2)
+            ->whereMonth('tanggal_pengajuan', $bulan)
+            ->whereYear('tanggal_pengajuan', $tahun)
+            ->pluck('status', 'tanggal_pengajuan');
+        $pengaturan = \App\Models\Pengaturan::first();
+        return view('dashboard.kalender.index', compact('presensi', 'izin', 'bulan', 'tahun', 'pengaturan') + ['title' => 'Kalender Kehadiran']);
+    })->name('karyawan.kalender');
 
     // QR scan (karyawan must be logged in)
     Route::get('/scan/{token}', [QrSessionController::class, 'scan'])->name('karyawan.scan');
@@ -191,6 +227,14 @@ Route::group([
     // Absensi Massal
     Route::get('/absensi-massal', [AbsensiMassalController::class, 'index'])->name('admin.absensi-massal');
     Route::post('/absensi-massal', [AbsensiMassalController::class, 'store'])->name('admin.absensi-massal.store');
+
+    // Lembur
+    Route::get('/lembur', [LemburController::class, 'adminIndex'])->name('admin.lembur');
+    Route::post('/lembur/setujui', [LemburController::class, 'approve'])->name('admin.lembur.approve');
+    Route::post('/lembur/tolak', [LemburController::class, 'reject'])->name('admin.lembur.reject');
+
+    // Monitoring Keterlambatan
+    Route::get('/monitoring/keterlambatan', [MonitoringController::class, 'keterlambatan'])->name('admin.monitoring.keterlambatan');
 });
 
 require __DIR__.'/auth.php';

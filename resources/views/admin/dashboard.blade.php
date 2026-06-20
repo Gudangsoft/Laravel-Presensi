@@ -122,6 +122,31 @@
             </div>
         </div>
 
+        {{-- ── Ulang Tahun Hari Ini ── --}}
+        @if($ultahHariIni->isNotEmpty())
+        <div class="rounded-2xl bg-gradient-to-r from-pink-500 via-rose-500 to-red-500 p-4 text-white shadow-lg">
+            <div class="flex items-center gap-3 flex-wrap">
+                <div class="text-3xl">🎂</div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-semibold uppercase tracking-widest opacity-80">Ulang Tahun Hari Ini</p>
+                    <div class="mt-1 flex flex-wrap gap-2">
+                        @foreach($ultahHariIni as $k)
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-sm font-semibold backdrop-blur-sm">
+                            @if($k->foto)
+                                <img src="{{ asset('storage/unggah/karyawan/' . $k->foto) }}" class="h-5 w-5 rounded-full object-cover">
+                            @else
+                                <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/30 text-xs font-bold">{{ strtoupper(substr($k->nama_lengkap,0,1)) }}</span>
+                            @endif
+                            {{ $k->nama_lengkap }}
+                            <span class="opacity-75 text-xs">- {{ $k->jabatan }}</span>
+                        </span>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
         {{-- ── Charts ── --}}
         <div class="grid grid-cols-1 gap-5 xl:grid-cols-3">
 

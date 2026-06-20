@@ -391,6 +391,48 @@
         @endif
     </div>
 
+    {{-- ══════════ ULANG TAHUN HARI INI ══════════ --}}
+    @if($ultahHariIni->isNotEmpty())
+    <div class="rounded-2xl border border-pink-200 bg-gradient-to-r from-pink-50 to-rose-50 shadow-sm overflow-hidden">
+        <div class="flex items-center gap-3 px-4 py-3 border-b border-pink-100">
+            <span class="text-xl">🎂</span>
+            <div>
+                <p class="text-sm font-bold text-rose-700">Ulang Tahun Hari Ini!</p>
+                <p class="text-[10px] text-rose-400">Ucapkan selamat kepada rekan kamu</p>
+            </div>
+        </div>
+        <div class="divide-y divide-pink-100">
+            @foreach($ultahHariIni as $u)
+            <div class="flex items-center gap-3 px-4 py-3">
+                <img src="{{ $u->foto ? asset('storage/unggah/karyawan/'.$u->foto) : 'https://ui-avatars.com/api/?name='.urlencode($u->nama_lengkap).'&background=f43f5e&color=fff&size=32' }}"
+                     class="w-9 h-9 rounded-xl object-cover flex-shrink-0" alt="">
+                <div class="flex-1">
+                    <p class="text-sm font-semibold text-gray-800">{{ $u->nama_lengkap }}</p>
+                    <p class="text-xs text-gray-400">{{ $u->jabatan ?: 'Karyawan' }}</p>
+                </div>
+                <span class="text-lg">🎉</span>
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
+    {{-- ══════════ GRAFIK KEHADIRAN 6 BULAN ══════════ --}}
+    <div class="rounded-2xl bg-white border border-gray-100 shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between px-4 py-3.5 border-b border-gray-50">
+            <div>
+                <h3 class="text-sm font-bold text-gray-800">Tren Kehadiran</h3>
+                <p class="text-[11px] text-gray-400">6 bulan terakhir</p>
+            </div>
+            <div class="w-8 h-8 rounded-xl bg-indigo-100 flex items-center justify-center">
+                <i class="ri-bar-chart-2-line text-indigo-600"></i>
+            </div>
+        </div>
+        <div class="p-4">
+            <canvas id="grafikKehadiran" height="140"></canvas>
+        </div>
+    </div>
+
     {{-- ══════════ LEADERBOARD ══════════ --}}
     <div class="rounded-3xl border border-gray-100 bg-white shadow-sm overflow-hidden">
         <div class="flex items-center justify-between px-4 py-3.5 border-b border-gray-50">
@@ -447,7 +489,37 @@
 @endsection
 
 @section("js")
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
+    // Grafik kehadiran
+    (function() {
+        const grafik = @json($grafikData);
+        const ctx = document.getElementById('grafikKehadiran');
+        if (!ctx) return;
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: grafik.map(g => g.bulan),
+                datasets: [{
+                    label: 'Hari Hadir',
+                    data: grafik.map(g => g.hadir),
+                    backgroundColor: 'rgba(99,102,241,0.15)',
+                    borderColor: '#6366f1',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f3f4f6' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    })();
+
     function updateClock() {
         const now   = new Date();
         const parts = now.toLocaleString('id-ID', {

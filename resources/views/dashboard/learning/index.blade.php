@@ -10,7 +10,7 @@
         </div>
         <div>
             <h1 class="text-xl font-bold text-gray-800">Smart Learning English</h1>
-            <p class="text-sm text-gray-400">Latih pronunciation bahasa Inggris kamu</p>
+            <p class="text-sm text-gray-400">Latih pronunciation & kosakata bahasa Inggris</p>
         </div>
     </div>
 
@@ -28,11 +28,26 @@
     {{-- GAME AREA --}}
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
 
-        {{-- Level Selector (tampil saat belum main) --}}
+        {{-- Level + Mode Selector --}}
         <div id="level-screen" class="p-8 text-center">
             <div class="text-5xl mb-4">🎯</div>
-            <h2 class="text-lg font-bold text-gray-800 mb-2">Pilih Tingkat Kesulitan</h2>
-            <p class="text-sm text-gray-400 mb-6">Setiap sesi terdiri dari 10 kata/frasa secara acak</p>
+            <h2 class="text-lg font-bold text-gray-800 mb-2">Pilih Mode & Tingkat Kesulitan</h2>
+
+            {{-- Mode Tabs --}}
+            <div class="flex rounded-xl bg-gray-100 p-1 mb-5 gap-1">
+                <button id="tab-pronunciation" onclick="setMode('pronunciation')"
+                    class="flex-1 rounded-lg py-2.5 text-sm font-semibold transition bg-white text-indigo-600 shadow-sm">
+                    <i class="ri-mic-line"></i> Pronunciation
+                </button>
+                <button id="tab-quiz" onclick="setMode('quiz')"
+                    class="flex-1 rounded-lg py-2.5 text-sm font-semibold transition text-gray-500 hover:text-gray-700">
+                    <i class="ri-list-check-3"></i> Mode Kuis
+                </button>
+            </div>
+
+            {{-- Mode description --}}
+            <p id="mode-desc" class="text-xs text-gray-400 mb-5">Dengar kata lalu ucapkan — cocok untuk latihan speaking</p>
+
             <div class="flex flex-col gap-3">
                 <button onclick="startGame('easy')"
                     class="w-full flex items-center justify-between rounded-xl border-2 border-emerald-200 bg-emerald-50 px-5 py-4 hover:bg-emerald-100 transition-colors">
@@ -69,23 +84,26 @@
                 </button>
             </div>
             <p class="text-xs text-gray-300 mt-5">
-                <i class="ri-chrome-line"></i> Fitur ini memerlukan browser Chrome / Edge
+                <i class="ri-chrome-line"></i> Mode Pronunciation memerlukan Chrome / Edge
             </p>
         </div>
 
-        {{-- Game Screen (tersembunyi awalnya) --}}
+        {{-- Pronunciation Game Screen --}}
         <div id="game-screen" class="hidden p-6">
 
-            {{-- Progress bar --}}
-            <div class="flex items-center justify-between mb-3">
-                <span class="text-xs text-gray-400" id="progress-text">1 / 10</span>
+            <div class="flex items-center justify-between mb-1">
+                <span class="text-xs px-2 py-0.5 rounded-full bg-teal-100 text-teal-700 font-semibold">
+                    <i class="ri-mic-line"></i> Pronunciation
+                </span>
                 <span class="text-xs font-semibold text-indigo-600" id="current-score-text">Skor: 0</span>
+            </div>
+            <div class="flex items-center justify-between mb-3 mt-2">
+                <span class="text-xs text-gray-400" id="progress-text">1 / 10</span>
             </div>
             <div class="w-full bg-gray-100 rounded-full h-2 mb-6">
                 <div id="progress-bar" class="bg-indigo-500 h-2 rounded-full transition-all duration-500" style="width:10%"></div>
             </div>
 
-            {{-- Word Display --}}
             <div class="text-center mb-6">
                 <p class="text-4xl font-bold text-gray-800 mb-2" id="word-display">—</p>
                 <p class="text-sm text-gray-400 italic" id="phonetic-display"></p>
@@ -93,7 +111,6 @@
                 <p class="text-xs text-gray-400 mt-2" id="example-display"></p>
             </div>
 
-            {{-- Buttons --}}
             <div class="flex gap-3 mb-5">
                 <button id="btn-listen" onclick="speakWord()"
                     class="flex-1 flex items-center justify-center gap-2 rounded-xl border-2 border-teal-200 bg-teal-50 py-3 text-sm font-semibold text-teal-700 hover:bg-teal-100 transition-colors">
@@ -105,15 +122,51 @@
                 </button>
             </div>
 
-            {{-- Result area --}}
             <div id="result-area" class="hidden rounded-xl p-4 mb-4 text-center">
                 <p class="text-2xl font-bold mb-1" id="result-score-display"></p>
                 <p class="text-sm" id="result-text"></p>
                 <p class="text-xs text-gray-400 mt-1">Kamu bilang: "<span id="result-heard"></span>"</p>
             </div>
 
-            {{-- Next button --}}
             <button id="btn-next" onclick="nextWord()" class="hidden w-full rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors">
+                Lanjut <i class="ri-arrow-right-line"></i>
+            </button>
+        </div>
+
+        {{-- Quiz Game Screen --}}
+        <div id="quiz-screen" class="hidden p-6">
+
+            <div class="flex items-center justify-between mb-1">
+                <span class="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 font-semibold">
+                    <i class="ri-list-check-3"></i> Mode Kuis
+                </span>
+                <span class="text-xs font-semibold text-indigo-600" id="quiz-score-text">Skor: 0</span>
+            </div>
+            <div class="flex items-center justify-between mb-3 mt-2">
+                <span class="text-xs text-gray-400" id="quiz-progress-text">1 / 10</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-2 mb-6">
+                <div id="quiz-progress-bar" class="bg-purple-500 h-2 rounded-full transition-all duration-500" style="width:10%"></div>
+            </div>
+
+            {{-- Question --}}
+            <div class="text-center mb-6">
+                <p class="text-xs text-gray-400 uppercase tracking-widest mb-2">Apa kata bahasa Inggris dari:</p>
+                <p class="text-3xl font-bold text-gray-800 mb-1" id="quiz-translation">—</p>
+                <p class="text-sm text-gray-400 italic" id="quiz-example"></p>
+            </div>
+
+            {{-- Choices --}}
+            <div id="quiz-choices" class="grid grid-cols-2 gap-3 mb-5"></div>
+
+            {{-- Feedback --}}
+            <div id="quiz-feedback" class="hidden rounded-xl p-4 mb-4 text-center">
+                <p class="text-xl font-bold mb-1" id="quiz-feedback-icon"></p>
+                <p class="text-sm font-semibold" id="quiz-feedback-text"></p>
+                <p class="text-xs text-gray-500 mt-1" id="quiz-feedback-answer"></p>
+            </div>
+
+            <button id="quiz-btn-next" onclick="quizNextWord()" class="hidden w-full rounded-xl bg-purple-600 py-3 text-sm font-semibold text-white hover:bg-purple-700 transition-colors">
                 Lanjut <i class="ri-arrow-right-line"></i>
             </button>
         </div>
@@ -167,11 +220,28 @@
 
 @section("js")
 <script>
-    let words = [], currentIndex = 0, currentLevel = 'easy';
+    let words = [], currentIndex = 0, currentLevel = 'easy', currentMode = 'pronunciation';
     let totalScore = 0, correctCount = 0;
     let recognition = null;
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    function setMode(mode) {
+        currentMode = mode;
+        const tabPronunciation = document.getElementById('tab-pronunciation');
+        const tabQuiz = document.getElementById('tab-quiz');
+        const desc = document.getElementById('mode-desc');
+
+        if (mode === 'pronunciation') {
+            tabPronunciation.className = 'flex-1 rounded-lg py-2.5 text-sm font-semibold transition bg-white text-indigo-600 shadow-sm';
+            tabQuiz.className = 'flex-1 rounded-lg py-2.5 text-sm font-semibold transition text-gray-500 hover:text-gray-700';
+            desc.textContent = 'Dengar kata lalu ucapkan — cocok untuk latihan speaking';
+        } else {
+            tabQuiz.className = 'flex-1 rounded-lg py-2.5 text-sm font-semibold transition bg-white text-purple-600 shadow-sm';
+            tabPronunciation.className = 'flex-1 rounded-lg py-2.5 text-sm font-semibold transition text-gray-500 hover:text-gray-700';
+            desc.textContent = 'Pilih jawaban yang benar dari 4 pilihan — cocok untuk latihan kosakata';
+        }
+    }
 
     async function startGame(level) {
         currentLevel = level;
@@ -184,10 +254,19 @@
 
         document.getElementById('level-screen').classList.add('hidden');
         document.getElementById('result-screen').classList.add('hidden');
-        document.getElementById('game-screen').classList.remove('hidden');
 
-        showWord();
+        if (currentMode === 'quiz') {
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+            showQuizWord();
+        } else {
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('quiz-screen').classList.add('hidden');
+            showWord();
+        }
     }
+
+    // ─── PRONUNCIATION MODE ───────────────────────────────────────────────────
 
     function showWord() {
         const w = words[currentIndex];
@@ -286,13 +365,97 @@
         }
     }
 
+    // ─── QUIZ MODE ────────────────────────────────────────────────────────────
+
+    function shuffleArray(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    function buildChoices(correctIndex) {
+        const correct = words[correctIndex];
+        const distractors = words
+            .filter((_, i) => i !== correctIndex)
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 3);
+        return shuffleArray([correct, ...distractors]);
+    }
+
+    function showQuizWord() {
+        const w = words[currentIndex];
+        document.getElementById('quiz-translation').textContent  = w.translation;
+        document.getElementById('quiz-example').textContent      = w.example ? '✏️ ' + w.example : '';
+        document.getElementById('quiz-progress-text').textContent= (currentIndex + 1) + ' / ' + words.length;
+        document.getElementById('quiz-progress-bar').style.width = ((currentIndex + 1) / words.length * 100) + '%';
+        document.getElementById('quiz-score-text').textContent   = 'Skor: ' + totalScore;
+        document.getElementById('quiz-feedback').classList.add('hidden');
+        document.getElementById('quiz-btn-next').classList.add('hidden');
+
+        const choices = buildChoices(currentIndex);
+        const container = document.getElementById('quiz-choices');
+        container.innerHTML = '';
+        choices.forEach(c => {
+            const btn = document.createElement('button');
+            btn.textContent = c.word;
+            btn.className = 'rounded-xl border-2 border-gray-200 bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:border-gray-300 transition-colors text-left';
+            btn.onclick = () => gradeQuiz(c.word, w.word, choices);
+            container.appendChild(btn);
+        });
+    }
+
+    function gradeQuiz(chosen, correct, choices) {
+        const isCorrect = chosen.toLowerCase() === correct.toLowerCase();
+        const points = isCorrect ? 100 : 0;
+        if (isCorrect) correctCount++;
+        totalScore += points;
+
+        // Color the buttons
+        const btns = document.getElementById('quiz-choices').querySelectorAll('button');
+        btns.forEach(btn => {
+            btn.disabled = true;
+            if (btn.textContent.toLowerCase() === correct.toLowerCase()) {
+                btn.className = 'rounded-xl border-2 border-emerald-400 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 transition-colors text-left';
+            } else if (btn.textContent === chosen && !isCorrect) {
+                btn.className = 'rounded-xl border-2 border-red-400 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 transition-colors text-left';
+            }
+        });
+
+        const fb = document.getElementById('quiz-feedback');
+        document.getElementById('quiz-feedback-icon').textContent  = isCorrect ? '✅ Benar!' : '❌ Salah';
+        document.getElementById('quiz-feedback-text').textContent  = isCorrect ? '+100 poin' : '+0 poin';
+        document.getElementById('quiz-feedback-answer').textContent = isCorrect ? '' : 'Jawaban benar: ' + correct;
+        fb.className = isCorrect
+            ? 'rounded-xl p-4 mb-4 text-center bg-emerald-50 border border-emerald-200'
+            : 'rounded-xl p-4 mb-4 text-center bg-red-50 border border-red-200';
+        fb.classList.remove('hidden');
+
+        document.getElementById('quiz-score-text').textContent = 'Skor: ' + totalScore;
+        document.getElementById('quiz-btn-next').classList.remove('hidden');
+    }
+
+    function quizNextWord() {
+        currentIndex++;
+        if (currentIndex >= words.length) {
+            showFinalResult();
+        } else {
+            showQuizWord();
+        }
+    }
+
+    // ─── SHARED ───────────────────────────────────────────────────────────────
+
     async function showFinalResult() {
         const avgScore = Math.round(totalScore / words.length);
         document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.add('hidden');
         document.getElementById('result-screen').classList.remove('hidden');
         document.getElementById('final-score-display').textContent = avgScore + ' / 100';
         document.getElementById('final-detail').textContent = correctCount + ' dari ' + words.length + ' kata benar';
-        document.getElementById('final-level').textContent = 'Level: ' + currentLevel.toUpperCase();
+        document.getElementById('final-level').textContent = 'Level: ' + currentLevel.toUpperCase() + ' | ' + (currentMode === 'quiz' ? 'Mode Kuis' : 'Pronunciation');
         document.getElementById('final-emoji').textContent =
             avgScore >= 90 ? '🏆' : avgScore >= 70 ? '🎯' : avgScore >= 50 ? '💪' : '📚';
 
@@ -320,6 +483,7 @@
     function showLevelScreen() {
         document.getElementById('result-screen').classList.add('hidden');
         document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.add('hidden');
         document.getElementById('level-screen').classList.remove('hidden');
     }
 

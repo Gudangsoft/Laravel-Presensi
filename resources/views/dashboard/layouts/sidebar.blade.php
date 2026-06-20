@@ -79,6 +79,42 @@
                 </a>
             </li>
 
+            {{-- Lembur --}}
+            <li>
+                <a href="{{ route('karyawan.lembur') }}"
+                   class="relative flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-150
+                          {{ Request::routeIs('karyawan.lembur')
+                              ? 'bg-white/10 text-white before:absolute before:left-0 before:top-1/2 before:h-5 before:w-1 before:-translate-y-1/2 before:rounded-r-full before:bg-indigo-400'
+                              : 'text-white/60 hover:bg-white/5 hover:text-white' }}">
+                    <i class="ri-time-line text-lg"></i>
+                    <span>Lembur</span>
+                </a>
+            </li>
+
+            {{-- Direktori --}}
+            <li>
+                <a href="{{ route('karyawan.direktori') }}"
+                   class="relative flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-150
+                          {{ Request::routeIs('karyawan.direktori')
+                              ? 'bg-white/10 text-white before:absolute before:left-0 before:top-1/2 before:h-5 before:w-1 before:-translate-y-1/2 before:rounded-r-full before:bg-indigo-400'
+                              : 'text-white/60 hover:bg-white/5 hover:text-white' }}">
+                    <i class="ri-contacts-book-2-line text-lg"></i>
+                    <span>Direktori</span>
+                </a>
+            </li>
+
+            {{-- Kalender --}}
+            <li>
+                <a href="{{ route('karyawan.kalender') }}"
+                   class="relative flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-150
+                          {{ Request::routeIs('karyawan.kalender')
+                              ? 'bg-white/10 text-white before:absolute before:left-0 before:top-1/2 before:h-5 before:w-1 before:-translate-y-1/2 before:rounded-r-full before:bg-indigo-400'
+                              : 'text-white/60 hover:bg-white/5 hover:text-white' }}">
+                    <i class="ri-calendar-check-line text-lg"></i>
+                    <span>Kalender</span>
+                </a>
+            </li>
+
             {{-- Smart Learning English --}}
             <li>
                 <a href="{{ route('karyawan.learning') }}"

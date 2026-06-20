@@ -60,7 +60,29 @@ class DashboardController extends Controller
         $pengaturan  = Pengaturan::first();
         $pengumuman  = Pengumuman::active()->limit(5)->get();
 
-        return view("dashboard.index", compact("title", "presensiHariIni", "riwayatPresensi", "rekapPresensi", "rekapPengajuanPresensi", "leaderboard", "pengaturan", "pengumuman"));
+        // Birthday hari ini
+        $ultahHariIni = Karyawan::whereNotNull('tanggal_lahir')
+            ->whereRaw('DAY(tanggal_lahir) = ? AND MONTH(tanggal_lahir) = ?', [now()->day, now()->month])
+            ->where('id', '!=', $user->id)
+            ->get();
+
+        // Grafik kehadiran 6 bulan terakhir
+        $grafikData = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $tgl = Carbon::now()->subMonths($i);
+            $hadir = DB::table('presensi')
+                ->where('karyawan_id', $user->id)
+                ->whereMonth('tanggal_presensi', $tgl->month)
+                ->whereYear('tanggal_presensi', $tgl->year)
+                ->count();
+            $grafikData[] = ['bulan' => $tgl->isoFormat('MMM'), 'hadir' => $hadir];
+        }
+
+        return view("dashboard.index", compact(
+            "title", "presensiHariIni", "riwayatPresensi", "rekapPresensi",
+            "rekapPengajuanPresensi", "leaderboard", "pengaturan", "pengumuman",
+            "ultahHariIni", "grafikData"
+        ));
     }
 
     public function indexAdmin()
@@ -134,10 +156,14 @@ class DashboardController extends Controller
 
         $activityLogs = ActivityLog::latest()->limit(10)->get();
 
+        $ultahHariIni = Karyawan::whereNotNull('tanggal_lahir')
+            ->whereRaw('DAY(tanggal_lahir) = ? AND MONTH(tanggal_lahir) = ?', [now()->day, now()->month])
+            ->get();
+
         return view("admin.dashboard", compact(
             "title", "totalKaryawan", "rekapPresensi", "rekapPengajuanPresensi",
             "totalTidakHadir", "karyawanHadir", "labels7Hari", "data7Hari", "rekapBulanIni",
-            "pengaturan", "holidayDates", "activityLogs"
+            "pengaturan", "holidayDates", "activityLogs", "ultahHariIni"
         ));
     }
 

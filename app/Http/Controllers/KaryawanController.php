@@ -109,13 +109,14 @@ class KaryawanController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'departemen_id' => 'required',
-            'nama_lengkap'  => 'required|string|max:255',
-            'foto'          => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'jabatan'       => 'required|string|max:255',
-            'telepon'       => 'required|string|max:15',
-            'email'         => 'required|string|email|max:255|unique:karyawan,email',
-            'password'      => 'required',
+            'departemen_id'  => 'required',
+            'nama_lengkap'   => 'required|string|max:255',
+            'foto'           => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'jabatan'        => 'required|string|max:255',
+            'telepon'        => 'required|string|max:15',
+            'tanggal_lahir'  => 'nullable|date',
+            'email'          => 'required|string|email|max:255|unique:karyawan,email',
+            'password'       => 'required',
         ]);
         $data['password'] = Hash::make($data['password']);
         unset($data['foto']);
@@ -146,13 +147,14 @@ class KaryawanController extends Controller
         $karyawan = Karyawan::where('id', $request->id)->first();
 
         $data = $request->validate([
-            'departemen_id' => 'required',
-            'nama_lengkap'  => 'required|string|max:255',
-            'foto'          => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'jabatan'       => 'required|string|max:255',
-            'telepon'       => 'required|string|max:15',
-            'email'         => ['required', 'email', Rule::unique('karyawan')->ignore($karyawan)],
-            'password'      => 'nullable|string|min:6',
+            'departemen_id'  => 'required',
+            'nama_lengkap'   => 'required|string|max:255',
+            'foto'           => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'jabatan'        => 'required|string|max:255',
+            'telepon'        => 'required|string|max:15',
+            'tanggal_lahir'  => 'nullable|date',
+            'email'          => ['required', 'email', Rule::unique('karyawan')->ignore($karyawan)],
+            'password'       => 'nullable|string|min:6',
         ]);
 
         if ($request->hasFile('foto')) {

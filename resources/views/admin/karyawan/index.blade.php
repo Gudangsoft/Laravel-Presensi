@@ -217,6 +217,12 @@
                                 <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
+                        {{-- Tanggal Lahir --}}
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700">Tanggal Lahir</label>
+                            <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}"
+                                   class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition" />
+                        </div>
                         {{-- Email --}}
                         <div>
                             <label class="mb-1.5 block text-sm font-medium text-gray-700">Email <span class="text-red-500">*</span></label>
@@ -309,6 +315,12 @@
                             <input type="text" name="telepon" placeholder="Telepon" required
                                    class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition" />
                             @error('telepon') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
+                        </div>
+                        {{-- Tanggal Lahir --}}
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700">Tanggal Lahir</label>
+                            <input type="date" name="tanggal_lahir"
+                                   class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition edit-tanggal-lahir" />
                         </div>
                         {{-- Email --}}
                         <div>
@@ -504,6 +516,7 @@
                     $("input[name='jabatan']").val(data.jabatan);
                     $("input[name='telepon']").val(data.telepon);
                     $("input[name='email']").val(data.email);
+                    $("input.edit-tanggal-lahir").val(data.tanggal_lahir ?? '');
 
                     const departemen = @json($departemen);
                     let options = '<option disabled>Pilih Departemen!</option>';

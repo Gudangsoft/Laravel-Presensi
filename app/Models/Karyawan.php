@@ -19,6 +19,7 @@ class Karyawan extends Authenticatable
         'foto',
         'jabatan',
         'telepon',
+        'tanggal_lahir',
         'email',
         'password',
     ];
@@ -31,7 +32,8 @@ class Karyawan extends Authenticatable
     protected function casts(): array
     {
         return [
-            'password' => 'hashed',
+            'password'      => 'hashed',
+            'tanggal_lahir' => 'date',
         ];
     }
 
