@@ -49,6 +49,16 @@
                 <span class="text-[10px] {{ $a4 ? 'font-bold text-indigo-600' : 'font-semibold' }} leading-none">Izin</span>
             </a>
 
+            {{-- Kalender --}}
+            @php $a7 = Request::routeIs('karyawan.kalender'); @endphp
+            <a href="{{ route('karyawan.kalender') }}"
+               class="flex flex-1 flex-col items-center justify-center gap-0.5 h-full transition-all duration-200 {{ $a7 ? 'text-indigo-600' : 'text-gray-400' }}">
+                <span class="flex h-8 w-8 items-center justify-center rounded-xl {{ $a7 ? 'bg-indigo-50' : '' }}">
+                    <i class="{{ $a7 ? 'ri-calendar-check-fill' : 'ri-calendar-check-line' }} text-xl"></i>
+                </span>
+                <span class="text-[10px] {{ $a7 ? 'font-bold text-indigo-600' : 'font-semibold' }} leading-none">Kalender</span>
+            </a>
+
             {{-- Smart Learning --}}
             @php $a6 = Request::routeIs('karyawan.learning'); @endphp
             <a href="{{ route('karyawan.learning') }}"
