@@ -26,14 +26,22 @@
                 <span class="text-[10px] {{ $a2 ? 'font-bold text-indigo-600' : 'font-semibold' }} leading-none">Riwayat</span>
             </a>
 
-            {{-- Center slot --}}
+            {{-- Kalender --}}
+            @php $a7 = Request::routeIs('karyawan.kalender'); @endphp
+            <a href="{{ route('karyawan.kalender') }}"
+               class="flex flex-1 flex-col items-center justify-center gap-0.5 h-full transition-all duration-200 {{ $a7 ? 'text-indigo-600' : 'text-gray-400' }}">
+                <span class="flex h-8 w-8 items-center justify-center rounded-xl {{ $a7 ? 'bg-indigo-50' : '' }}">
+                    <i class="{{ $a7 ? 'ri-calendar-check-fill' : 'ri-calendar-check-line' }} text-xl"></i>
+                </span>
+                <span class="text-[10px] {{ $a7 ? 'font-bold text-indigo-600' : 'font-semibold' }} leading-none">Kalender</span>
+            </a>
+
+            {{-- Center slot: Presensi FAB --}}
             <div class="flex-1 relative" style="height:64px;">
-                {{-- FAB: float above bar --}}
                 <a href="{{ route('karyawan.presensi') }}"
                    style="position:absolute; top:-24px; left:50%; transform:translateX(-50%); width:54px; height:54px; border-radius:16px; background:linear-gradient(135deg,#4f46e5,#7c3aed); box-shadow:0 6px 20px rgba(79,70,229,0.5); display:flex; align-items:center; justify-content:center; text-decoration:none;">
                     <i class="ri-fingerprint-line text-white" style="font-size:26px;"></i>
                 </a>
-                {{-- Label --}}
                 <span style="position:absolute; bottom:6px; left:50%; transform:translateX(-50%); white-space:nowrap; font-size:10px; font-weight:700; line-height:1; {{ Request::routeIs('karyawan.presensi') ? 'color:#4f46e5;' : 'color:#9ca3af;' }}">
                     Presensi
                 </span>
@@ -49,22 +57,12 @@
                 <span class="text-[10px] {{ $a4 ? 'font-bold text-indigo-600' : 'font-semibold' }} leading-none">Izin</span>
             </a>
 
-            {{-- Kalender --}}
-            @php $a7 = Request::routeIs('karyawan.kalender'); @endphp
-            <a href="{{ route('karyawan.kalender') }}"
-               class="flex flex-1 flex-col items-center justify-center gap-0.5 h-full transition-all duration-200 {{ $a7 ? 'text-indigo-600' : 'text-gray-400' }}">
-                <span class="flex h-8 w-8 items-center justify-center rounded-xl {{ $a7 ? 'bg-indigo-50' : '' }}">
-                    <i class="{{ $a7 ? 'ri-calendar-check-fill' : 'ri-calendar-check-line' }} text-xl"></i>
-                </span>
-                <span class="text-[10px] {{ $a7 ? 'font-bold text-indigo-600' : 'font-semibold' }} leading-none">Kalender</span>
-            </a>
-
             {{-- Smart Learning --}}
             @php $a6 = Request::routeIs('karyawan.learning'); @endphp
             <a href="{{ route('karyawan.learning') }}"
                class="flex flex-1 flex-col items-center justify-center gap-0.5 h-full transition-all duration-200 {{ $a6 ? 'text-indigo-600' : 'text-gray-400' }}">
                 <span class="relative flex h-8 w-8 items-center justify-center rounded-xl {{ $a6 ? 'bg-indigo-50' : '' }}">
-                    <i class="{{ $a6 ? 'ri-translate-2' : 'ri-translate-2' }} text-xl"></i>
+                    <i class="ri-translate-2 text-xl"></i>
                     @if(!$a6)
                         <span class="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-emerald-500"></span>
                     @endif
